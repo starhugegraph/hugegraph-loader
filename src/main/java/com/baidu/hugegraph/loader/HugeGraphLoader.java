@@ -222,6 +222,7 @@ public final class HugeGraphLoader {
                 parallelCount, "loader");
 
         List<CompletableFuture<Void>> loadTasks = new ArrayList<>();
+        List<InputReader> readers = new ArrayList<>();
 
         for (InputStruct struct : structs) {
             if (this.context.stopped()) {
@@ -232,11 +233,13 @@ public final class HugeGraphLoader {
             }
 
             // Create and init InputReader, fetch next batch lines
-            try (InputReader reader = InputReader.create(struct.input())) {
+            try {
+                InputReader reader = InputReader.create(struct.input());
                 // Init reader
                 reader.init(this.context, struct);
                 // Load data from current input mapping
                 loadTasks.add(this.asyncLoadStruct(struct, reader, service));
+                readers.add(reader);
             } catch (InitException e) {
                 throw new LoadException("Failed to init input reader", e);
             }
@@ -247,6 +250,9 @@ public final class HugeGraphLoader {
                 .join();
 
         service.shutdown();
+
+        for (InputReader reader : readers)
+            reader.close();
         LOG.info("load finish");
     }
 
