@@ -90,7 +90,8 @@ public final class Printer {
         });
 
         // Print and log total vertices/edges metrics
-        printAndLog(DIVIDE_LINE + "\n" + getCountReport(LoadReport.collect(summary)) +
+        printAndLog(DIVIDE_LINE + "\n" +
+                 getCountReport(LoadReport.collect(summary)) +
                 "\n" + DIVIDE_LINE);
         printMeterReport(summary);
     }
@@ -165,8 +166,8 @@ public final class Printer {
 
         LoadSummary.LoadRater rater =
                 type.isVertex() ? summary.vertex() : summary.edge();
-        if (rater.getCount() % frequency < batchSize
-                &&(rater.curRate()!=0||rater.getCount()==0)) {
+        if (rater.getCount() % frequency < batchSize &&
+                (rater.curRate() != 0 || rater.getCount() == 0)) {
             LOG.info("{} loaded: {}, " +
                             "average rate: {}/s, cur rate: {}/s, " +
                             "average queue: {}, cur queue: {}",

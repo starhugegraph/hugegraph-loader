@@ -206,7 +206,7 @@ public final class HugeGraphLoader {
 
     private void loadStructs(List<InputStruct> structs) {
         int parallelCount = this.context.options().parallelCount;
-        if (structs.size()==0) {
+        if (structs.size() == 0) {
             return;
         }
         if ( parallelCount <= 0 ) {
