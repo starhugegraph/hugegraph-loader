@@ -30,11 +30,12 @@ import com.baidu.hugegraph.loader.mapping.InputStruct;
 import com.baidu.hugegraph.loader.reader.AbstractReader;
 import com.baidu.hugegraph.loader.reader.line.Line;
 import com.baidu.hugegraph.loader.source.jdbc.JDBCSource;
+import com.baidu.hugegraph.loader.source.jdbc.JDBCVendor;
 
 public class JDBCReader extends AbstractReader {
 
     private final JDBCSource source;
-    private final RowFetcher fetcher;
+    private Fetcher fetcher ;
 
     private List<Line> batch;
     private int offsetInBatch;
@@ -42,7 +43,12 @@ public class JDBCReader extends AbstractReader {
     public JDBCReader(JDBCSource source) {
         this.source = source;
         try {
-            this.fetcher = new RowFetcher(source);
+            // if JDBCFetcher works well,it should replace RowFetcher
+            if (source.vendor() == JDBCVendor.HIVE) {
+                this.fetcher = new JDBCFetcher(source);
+            } else {
+                this.fetcher = new RowFetcher(source);
+            }
         } catch (Exception e) {
             throw new LoadException("Failed to connect database via '%s'",
                                     e, source.url());
