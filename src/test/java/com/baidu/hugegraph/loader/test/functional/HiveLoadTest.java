@@ -46,7 +46,7 @@ public class HiveLoadTest extends LoadTest {
 
     private static DBUtil dbUtil = new DBUtil(DRIVER, DB_URL, USER, PASS);
 
-    @BeforeClass
+//    @BeforeClass
     public static void setUp() {
         clearServerData();
 
@@ -92,7 +92,7 @@ public class HiveLoadTest extends LoadTest {
                        ")");
     }
 
-    @AfterClass
+//    @AfterClass
     public static void tearDown() {
         // drop tables
         dbUtil.execute("DROP TABLE IF EXISTS `person`");
@@ -105,11 +105,11 @@ public class HiveLoadTest extends LoadTest {
         dbUtil.close();
     }
 
-    @Before
+//    @Before
     public void init() {
     }
 
-    @After
+//    @After
     public void clear() {
         clearServerData();
 
@@ -119,11 +119,8 @@ public class HiveLoadTest extends LoadTest {
         dbUtil.execute("TRUNCATE TABLE `created`");
     }
 
-    @Test
+//    @Test
     public void testCustomizedSchema() {
-        try {
-
-
         dbUtil.insert("INSERT INTO `person` VALUES " +
                       "(1,'marko',29,'Beijing')," +
                       "(2,'vadas',27,'HongKong')," +
@@ -167,12 +164,9 @@ public class HiveLoadTest extends LoadTest {
             Assert.assertEquals(Integer.class, edge.sourceId().getClass());
             Assert.assertEquals(Integer.class, edge.targetId().getClass());
         }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
-    @Test
+//    @Test
     public void testEmptyTable() {
         String[] args = new String[]{
                 "-f", configPath("jdbc_hive_schema/struct.json"),
@@ -191,7 +185,7 @@ public class HiveLoadTest extends LoadTest {
         Assert.assertEquals(0, edges.size());
     }
 
-    @Test
+//    @Test
     public void testValueMappingInJDBCSource() {
         dbUtil.insert("INSERT INTO `person` VALUES " +
                       "(1,'marko',29,'1')," +
