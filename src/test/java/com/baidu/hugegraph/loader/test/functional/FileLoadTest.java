@@ -2045,7 +2045,7 @@ public class FileLoadTest extends LoadTest {
 
         Map<String, InputProgress> inputProgressMap = context.newProgress()
                                                              .inputProgress();
-        Assert.assertEquals(1, inputProgressMap.size());
+        Assert.assertEquals(2, inputProgressMap.size());
         inputProgressMap.forEach((id, inputProgress) -> {
             if (id.equals("1")) {
                 Set<InputItemProgress> loadedItems = inputProgress.loadedItems();
