@@ -398,6 +398,10 @@
                     <groupId>org.apache.hive</groupId>
                     <artifactId>hive-common</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hive</groupId>
+                    <artifactId>hive-serde</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
