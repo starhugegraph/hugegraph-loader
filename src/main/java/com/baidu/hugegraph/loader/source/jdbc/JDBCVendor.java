@@ -272,6 +272,34 @@ public enum JDBCVendor {
         public String escape(String value) {
             return JDBCUtil.escapeSqlserver(value);
         }
+    },
+
+    HIVE {
+        @Override
+        public String defaultDriver() {
+            return "org.apache.hive.jdbc.HiveDriver";
+        }
+
+        @Override
+        public String defaultSchema(JDBCSource source) {
+            return source.database();
+        }
+
+        @Override
+        public String buildGetHeaderSql(JDBCSource source) {
+            return null;
+        }
+
+        @Override
+        public String buildGetPrimaryKeySql(JDBCSource source) {
+            return null;
+        }
+
+        @Override
+        public String escape(String value) {
+            return JDBCUtil.escapeMysql(value);
+        }
+
     };
 
     public abstract String defaultDriver();
