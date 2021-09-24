@@ -3020,7 +3020,7 @@ public class FileLoadTest extends LoadTest {
         Assert.assertEquals(6, vertices.size());
     }
 
-    @Test
+//    @Test
     public void testHttpsClientValueMapping() {
         ioUtil.write("vertex_person.csv",
                      "tiny,1,1,1",
@@ -3045,13 +3045,13 @@ public class FileLoadTest extends LoadTest {
                                     .configSSL(TRUST_STORE_FILE, "hugegraph")
                                     .build();
             List<Vertex> vertices = httpsClient.graph().listVertices();
-//            Assert.assertEquals(2, vertices.size());
+            Assert.assertEquals(2, vertices.size());
         } finally {
             clearAndClose(httpsClient, GRAPH);
         }
     }
 
-    @Test
+//    @Test
     public void testHttpsHolderClientValueMapping() {
         ioUtil.write("vertex_person.csv",
                      "marko,1,1,1",
