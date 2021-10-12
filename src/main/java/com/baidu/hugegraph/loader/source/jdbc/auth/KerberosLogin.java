@@ -58,15 +58,7 @@ public class KerberosLogin implements Authentication {
                         ZOOKEEPER_SERVER_PRINCIPAL_KEY,
                         zookeeperPrincipal);
                 Configuration conf = new Configuration();
-                //  conf.setBoolean("hadoop.security.authorization", true);
-                  conf.set("hadoop.security.authentication", "kerberos");
-                //  System.setProperty("sun.security.krb5.debug", "true");
-//                String credsOnly = "false";
-//                if (!StringUtils.isEmpty(clientInfo.get("credsOnly"))) {
-//                    credsOnly = clientInfo.get("credsOnly");
-//                }
-//                System.setProperty("javax.security.auth.useSubjectCredsOnly",
-//                        "false");
+                conf.set("hadoop.security.authentication", "kerberos");
                 UserGroupInformation.setConfiguration(conf);
                 UserGroupInformation.loginUserFromKeytab(
                         userName,
