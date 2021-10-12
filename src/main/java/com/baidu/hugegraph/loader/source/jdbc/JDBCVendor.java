@@ -47,9 +47,9 @@ public enum JDBCVendor {
             String schema = source.schema();
             if (schema != null) {
                 E.checkArgument(schema.equals(source.database()),
-                       "The schema(%s) is allowed to not " +
-                               "specified in %s vendor, if specified, " +
-                               "it must be same as the database(%s)",
+                        "The schema(%s) is allowed to not " +
+                                "specified in %s vendor, if specified, " +
+                                "it must be same as the database(%s)",
                          schema, this, source.database());
             }
             return super.checkSchema(source);
@@ -157,7 +157,7 @@ public enum JDBCVendor {
                                  "FROM USER_TAB_COLUMNS " +
                                  "WHERE TABLE_NAME = %s " +
                                  "ORDER BY COLUMN_ID",
-                    this.escape(source.table()));
+                                 this.escape(source.table()));
         }
 
         @Override
@@ -210,7 +210,7 @@ public enum JDBCVendor {
         @Override
         public String checkSchema(JDBCSource source) {
             E.checkArgument(source.schema() != null,
-                             "The schema must be specified in %s vendor", this);
+                            "The schema must be specified in %s vendor", this);
             return source.schema();
         }
 
@@ -331,11 +331,12 @@ public enum JDBCVendor {
         } else {
             URIBuilder uriBuilder = new URIBuilder();
             uriBuilder.setPath(url)
-                    .setParameter("useSSL", "false")
-                    .setParameter("characterEncoding", Constants.CHARSET.name())
-                    .setParameter("rewriteBatchedStatements", "true")
-                    .setParameter("useServerPrepStmts", "false")
-                    .setParameter("autoReconnect", "true");
+                      .setParameter("useSSL", "false")
+                      .setParameter("characterEncoding",
+                                    Constants.CHARSET.name())
+                      .setParameter("rewriteBatchedStatements", "true")
+                      .setParameter("useServerPrepStmts", "false")
+                      .setParameter("autoReconnect", "true");
             return uriBuilder.toString();
         }
     }
