@@ -33,6 +33,9 @@ public abstract class Fetcher {
 
     private Connection connect() throws SQLException {
         String url = this.getSource().vendor().buildUrl(this.source);
+        if (url == null) {
+            throw new LoadException("Invalid url !");
+        }
         LOG.info("Connect to database {}", url);
         String driverName = this.source.driver();
         String username = this.source.username();

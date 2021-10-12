@@ -19,17 +19,20 @@
 
 package com.baidu.hugegraph.loader.source.jdbc;
 
+import com.baidu.hugegraph.loader.source.jdbc.auth.KerberosLogin;
+import com.baidu.hugegraph.util.Log;
+import org.apache.commons.collections.MapUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 import com.baidu.hugegraph.loader.constant.Constants;
 import com.baidu.hugegraph.loader.reader.line.Line;
 import com.baidu.hugegraph.loader.reader.jdbc.JDBCUtil;
 import com.baidu.hugegraph.util.E;
+import org.slf4j.Logger;
 
 public enum JDBCVendor {
 
     MYSQL {
-
         @Override
         public String defaultDriver() {
             return "com.mysql.cj.jdbc.Driver";
@@ -45,10 +48,10 @@ public enum JDBCVendor {
             String schema = source.schema();
             if (schema != null) {
                 E.checkArgument(schema.equals(source.database()),
-                                "The schema(%s) is allowed to not " +
+                        "The schema(%s) is allowed to not " +
                                 "specified in %s vendor, if specified, " +
                                 "it must be same as the database(%s)",
-                                schema, this, source.database());
+                        schema, this, source.database());
             }
             return super.checkSchema(source);
         }
@@ -56,23 +59,23 @@ public enum JDBCVendor {
         @Override
         public String buildGetHeaderSql(JDBCSource source) {
             return String.format("SELECT COLUMN_NAME " +
-                                 "FROM INFORMATION_SCHEMA.COLUMNS " +
-                                 "WHERE TABLE_SCHEMA = %s " +
-                                 "AND TABLE_NAME = %s " +
-                                 "ORDER BY ORDINAL_POSITION;",
-                                 this.escape(source.schema()),
-                                 this.escape(source.table()));
+                            "FROM INFORMATION_SCHEMA.COLUMNS " +
+                            "WHERE TABLE_SCHEMA = %s " +
+                            "AND TABLE_NAME = %s " +
+                            "ORDER BY ORDINAL_POSITION;",
+                    this.escape(source.schema()),
+                    this.escape(source.table()));
         }
 
         @Override
         public String buildGetPrimaryKeySql(JDBCSource source) {
             return String.format("SELECT COLUMN_NAME " +
-                                 "FROM INFORMATION_SCHEMA.COLUMNS " +
-                                 "WHERE TABLE_SCHEMA = %s " +
-                                 "AND TABLE_NAME = %s " +
-                                 "AND COLUMN_KEY = 'PRI';",
-                                 this.escape(source.schema()),
-                                 this.escape(source.table()));
+                            "FROM INFORMATION_SCHEMA.COLUMNS " +
+                            "WHERE TABLE_SCHEMA = %s " +
+                            "AND TABLE_NAME = %s " +
+                            "AND COLUMN_KEY = 'PRI';",
+                    this.escape(source.schema()),
+                    this.escape(source.table()));
         }
 
         @Override
@@ -82,7 +85,6 @@ public enum JDBCVendor {
     },
 
     POSTGRESQL {
-
         @Override
         public String defaultDriver() {
             return "org.postgresql.Driver";
@@ -96,27 +98,27 @@ public enum JDBCVendor {
         @Override
         public String buildGetHeaderSql(JDBCSource source) {
             return String.format("SELECT COLUMN_NAME " +
-                                 "FROM INFORMATION_SCHEMA.COLUMNS " +
-                                 "WHERE TABLE_CATALOG = %s " +
-                                 "AND TABLE_SCHEMA = %s " +
-                                 "AND TABLE_NAME = %s " +
-                                 "ORDER BY ORDINAL_POSITION;",
-                                 this.escape(source.database()),
-                                 this.escape(source.schema()),
-                                 this.escape(source.table()));
+                            "FROM INFORMATION_SCHEMA.COLUMNS " +
+                            "WHERE TABLE_CATALOG = %s " +
+                            "AND TABLE_SCHEMA = %s " +
+                            "AND TABLE_NAME = %s " +
+                            "ORDER BY ORDINAL_POSITION;",
+                    this.escape(source.database()),
+                    this.escape(source.schema()),
+                    this.escape(source.table()));
         }
 
         @Override
         public String buildGetPrimaryKeySql(JDBCSource source) {
             return String.format("SELECT a.attname AS COLUMN_NAME " +
-                                 "FROM pg_index i " +
-                                 "JOIN pg_attribute a " +
-                                 "ON a.attrelid = i.indrelid " +
-                                 "AND a.attnum = ANY(i.indkey) " +
-                                 "WHERE i.indrelid = '%s.%s'::regclass " +
-                                 "AND i.indisprimary;",
-                                 source.schema(),
-                                 source.table());
+                            "FROM pg_index i " +
+                            "JOIN pg_attribute a " +
+                            "ON a.attrelid = i.indrelid " +
+                            "AND a.attnum = ANY(i.indkey) " +
+                            "WHERE i.indrelid = '%s.%s'::regclass " +
+                            "AND i.indisprimary;",
+                    source.schema(),
+                    source.table());
         }
 
         @Override
@@ -126,7 +128,6 @@ public enum JDBCVendor {
     },
 
     ORACLE {
-
         @Override
         public String defaultDriver() {
             return "oracle.jdbc.driver.OracleDriver";
@@ -154,37 +155,37 @@ public enum JDBCVendor {
         @Override
         public String buildGetHeaderSql(JDBCSource source) {
             return String.format("SELECT COLUMN_NAME " +
-                                 "FROM USER_TAB_COLUMNS " +
-                                 "WHERE TABLE_NAME = %s " +
-                                 "ORDER BY COLUMN_ID",
-                                 this.escape(source.table()));
+                            "FROM USER_TAB_COLUMNS " +
+                            "WHERE TABLE_NAME = %s " +
+                            "ORDER BY COLUMN_ID",
+                    this.escape(source.table()));
         }
 
         @Override
         public String buildGetPrimaryKeySql(JDBCSource source) {
             return String.format("SELECT cols.column_name AS COLUMN_NAME " +
-                                 "FROM all_constraints cons, " +
-                                 "all_cons_columns cols " +
-                                 "WHERE cols.table_name = %s " +
-                                 "AND cons.constraint_type = 'P' " +
-                                 "AND cons.constraint_name = " +
-                                 "cols.constraint_name " +
-                                 "AND cons.owner = cols.owner " +
-                                 "ORDER BY cols.table_name, cols.position",
-                                 this.escape(source.table()));
+                            "FROM all_constraints cons, " +
+                            "all_cons_columns cols " +
+                            "WHERE cols.table_name = %s " +
+                            "AND cons.constraint_type = 'P' " +
+                            "AND cons.constraint_name = " +
+                            "cols.constraint_name " +
+                            "AND cons.owner = cols.owner " +
+                            "ORDER BY cols.table_name, cols.position",
+                    this.escape(source.table()));
         }
 
         @Override
         public String buildSelectSql(JDBCSource source, Line nextStartRow) {
             StringBuilder builder = new StringBuilder();
             builder.append("SELECT * FROM ")
-                   .append("\"").append(source.schema()).append("\"")
-                   .append(".")
-                   .append("\"").append(source.table()).append("\"")
-                   .append(" WHERE ");
+                    .append("\"").append(source.schema()).append("\"")
+                    .append(".")
+                    .append("\"").append(source.table()).append("\"")
+                    .append(" WHERE ");
             if (nextStartRow != null) {
                 builder.append(this.buildGteClauseInFlattened(nextStartRow))
-                       .append(" AND ");
+                        .append(" AND ");
             }
             builder.append("ROWNUM <= ").append(source.batchSize() + 1);
             return builder.toString();
@@ -197,7 +198,6 @@ public enum JDBCVendor {
     },
 
     SQLSERVER {
-
         @Override
         public String defaultDriver() {
             return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
@@ -211,7 +211,7 @@ public enum JDBCVendor {
         @Override
         public String checkSchema(JDBCSource source) {
             E.checkArgument(source.schema() != null,
-                            "The schema must be specified in %s vendor", this);
+                    "The schema must be specified in %s vendor", this);
             return source.schema();
         }
 
@@ -230,39 +230,39 @@ public enum JDBCVendor {
         @Override
         public String buildGetHeaderSql(JDBCSource source) {
             return String.format("SELECT COLUMN_NAME " +
-                                 "FROM INFORMATION_SCHEMA.COLUMNS " +
-                                 "WHERE TABLE_CATALOG = N%s " +
-                                 "AND TABLE_SCHEMA = N%s " +
-                                 "AND TABLE_NAME = N%s " +
-                                 "ORDER BY ORDINAL_POSITION;",
-                                 this.escape(source.database()),
-                                 this.escape(source.schema()),
-                                 this.escape(source.table()));
+                            "FROM INFORMATION_SCHEMA.COLUMNS " +
+                            "WHERE TABLE_CATALOG = N%s " +
+                            "AND TABLE_SCHEMA = N%s " +
+                            "AND TABLE_NAME = N%s " +
+                            "ORDER BY ORDINAL_POSITION;",
+                    this.escape(source.database()),
+                    this.escape(source.schema()),
+                    this.escape(source.table()));
         }
 
         @Override
         public String buildGetPrimaryKeySql(JDBCSource source) {
             return String.format("SELECT COLUMN_NAME " +
-                                 "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
-                                 "WHERE OBJECTPROPERTY(OBJECT_ID(" +
-                                 "CONSTRAINT_SCHEMA + '.' + QUOTENAME(" +
-                                 "CONSTRAINT_NAME)), 'IsPrimaryKey') = 1" +
-                                 "AND TABLE_SCHEMA = N%s " +
-                                 "AND TABLE_NAME = N%s;",
-                                 this.escape(source.schema()),
-                                 this.escape(source.table()));
+                            "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
+                            "WHERE OBJECTPROPERTY(OBJECT_ID(" +
+                            "CONSTRAINT_SCHEMA + '.' + QUOTENAME(" +
+                            "CONSTRAINT_NAME)), 'IsPrimaryKey') = 1" +
+                            "AND TABLE_SCHEMA = N%s " +
+                            "AND TABLE_NAME = N%s;",
+                    this.escape(source.schema()),
+                    this.escape(source.table()));
         }
 
         @Override
         public String buildSelectSql(JDBCSource source, Line nextStartRow) {
             StringBuilder builder = new StringBuilder();
             builder.append("SELECT ")
-                   .append("TOP ").append(source.batchSize() + 1)
-                   .append(" * FROM ")
-                   .append(source.schema()).append(".").append(source.table());
+                    .append("TOP ").append(source.batchSize() + 1)
+                    .append(" * FROM ")
+                    .append(source.schema()).append(".").append(source.table());
             if (nextStartRow != null) {
                 builder.append(" WHERE ")
-                       .append(this.buildGteClauseInFlattened(nextStartRow));
+                        .append(this.buildGteClauseInFlattened(nextStartRow));
             }
             builder.append(";");
             return builder.toString();
@@ -302,6 +302,8 @@ public enum JDBCVendor {
 
     };
 
+    public static final Logger LOG = Log.logger(JDBCVendor.class);
+
     public abstract String defaultDriver();
 
     public abstract String defaultSchema(JDBCSource source);
@@ -318,15 +320,25 @@ public enum JDBCVendor {
         } else {
             url = String.format("%s/%s", url, source.database());
         }
-
-        URIBuilder uriBuilder = new URIBuilder();
-        uriBuilder.setPath(url)
-                  .setParameter("useSSL", "false")
-                  .setParameter("characterEncoding", Constants.CHARSET.name())
-                  .setParameter("rewriteBatchedStatements", "true")
-                  .setParameter("useServerPrepStmts", "false")
-                  .setParameter("autoReconnect", "true");
-        return uriBuilder.toString();
+        if (!MapUtils.isEmpty(source.getPrincipals())) {
+            StringBuilder builder = new StringBuilder(url);
+            try {
+                builder.append(new KerberosLogin().auth(source));
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+                return null;
+            }
+            return builder.toString();
+        } else {
+            URIBuilder uriBuilder = new URIBuilder();
+            uriBuilder.setPath(url)
+                    .setParameter("useSSL", "false")
+                    .setParameter("characterEncoding", Constants.CHARSET.name())
+                    .setParameter("rewriteBatchedStatements", "true")
+                    .setParameter("useServerPrepStmts", "false")
+                    .setParameter("autoReconnect", "true");
+            return uriBuilder.toString();
+        }
     }
 
     public abstract String buildGetHeaderSql(JDBCSource source);
@@ -336,13 +348,13 @@ public enum JDBCVendor {
     public String buildSelectSql(JDBCSource source, Line nextStartRow) {
         StringBuilder builder = new StringBuilder();
         builder.append("SELECT * FROM ")
-               .append(source.schema()).append(".").append(source.table());
+                .append(source.schema()).append(".").append(source.table());
         if (nextStartRow != null) {
             builder.append(" WHERE ")
-                   .append(this.buildGteClauseInCombined(nextStartRow));
+                    .append(this.buildGteClauseInCombined(nextStartRow));
         }
         builder.append(" LIMIT ").append(source.batchSize() + 1)
-               .append(";");
+                .append(";");
         return builder.toString();
     }
 
@@ -403,8 +415,8 @@ public enum JDBCVendor {
                     }
                 }
                 builder.append("\"").append(name).append("\"")
-                       .append(operator)
-                       .append(this.escapeIfNeeded(value));
+                        .append(operator)
+                        .append(this.escapeIfNeeded(value));
                 if (appendAnd) {
                     builder.append(" AND ");
                 }

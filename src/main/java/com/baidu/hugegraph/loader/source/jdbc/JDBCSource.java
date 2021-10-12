@@ -26,6 +26,8 @@ import com.baidu.hugegraph.util.E;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.Map;
+
 @JsonPropertyOrder({"type", "vendor"})
 public class JDBCSource extends AbstractSource {
 
@@ -47,7 +49,12 @@ public class JDBCSource extends AbstractSource {
     private String password;
     @JsonProperty("batch_size")
     private int batchSize = 500;
-
+    @JsonProperty("principal")
+    private String principal;
+    @JsonProperty("properties")
+    private Map<String,String> properties;
+    @JsonProperty("principals")
+    private Map<String,String> principals;
     @Override
     public SourceType type() {
         return SourceType.JDBC;
@@ -113,7 +120,16 @@ public class JDBCSource extends AbstractSource {
         source.listFormat(this.listFormat());
         return source;
     }
+    public String principal() {
+        return this.principal;
+    }
 
+    public Map<String,String> getProperties() {
+        return properties;
+    }
+    public Map<String,String> getPrincipals() {
+        return principals;
+    }
     @Override
     public String toString() {
         return String.format("%s(%s)", this.type(), this.url());
