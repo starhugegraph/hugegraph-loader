@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
  * @since 8.0.0
  */
 public class KerberosUtil {
+
     /**
      * JAVA_VENDER
      */
@@ -28,17 +29,16 @@ public class KerberosUtil {
      * CONFIG_CLASS_FOR_IBM
      */
     public static final String CONFIG_CLASS_FOR_IBM =
-            "com.ibm.security.krb5.internal.Config";
+           "com.ibm.security.krb5.internal.Config";
     /**
      * CONFIG_CLASS_FOR_SUN
      */
     public static final String CONFIG_CLASS_FOR_SUN =
-            "sun.security.krb5.Config";
+           "sun.security.krb5.Config";
     /**
      * METHOD_GET_INSTANCE
      */
-    public static final String METHOD_GET_INSTANCE =
-            "getInstance";
+    public static final String METHOD_GET_INSTANCE = "getInstance";
     /**
      * METHOD_GET_DEFAULT_REALM
      */
@@ -64,26 +64,24 @@ public class KerberosUtil {
             }
 
             Method getInstanceMethod =
-                    krb5ConfClass.getMethod(METHOD_GET_INSTANCE);
+                   krb5ConfClass.getMethod(METHOD_GET_INSTANCE);
             Object kerbConf = getInstanceMethod.invoke(krb5ConfClass);
 
             Method getDefaultRealmMethod =
-                    krb5ConfClass.getDeclaredMethod(METHOD_GET_DEFAULT_REALM);
+                   krb5ConfClass.getDeclaredMethod(METHOD_GET_DEFAULT_REALM);
             if (getDefaultRealmMethod.invoke(kerbConf) instanceof String) {
-                peerRealm =
-                        (String) getDefaultRealmMethod.invoke(kerbConf);
+                peerRealm = (String) getDefaultRealmMethod.invoke(kerbConf);
             }
             LOGGER.info("Get default realm successfully, the realm is : {}",
-                    peerRealm);
-
+                        peerRealm);
         } catch (ClassNotFoundException e) {
             peerRealm = DEFAULT_REALM;
             LOGGER.warn("Get default realm failed, use default value : " +
-                    DEFAULT_REALM);
+                        DEFAULT_REALM);
         } catch (Exception e) {
             peerRealm = DEFAULT_REALM;
             LOGGER.warn("Get default realm failed, use default value : " +
-                    DEFAULT_REALM);
+                        DEFAULT_REALM);
         }
 
         return peerRealm;

@@ -53,16 +53,15 @@ public class KerberosLogin implements Authentication {
                     zookeeperPrincipal = userName;
                 }
                 LoginUtil.setJaasConf(ZOOKEEPER_DEFAULT_LOGIN_CONTEXT_NAME,
-                        userName, userKeytabFile);
+                                      userName, userKeytabFile);
                 LoginUtil.setZookeeperServerPrincipal(
-                        ZOOKEEPER_SERVER_PRINCIPAL_KEY,
-                        zookeeperPrincipal);
+                         ZOOKEEPER_SERVER_PRINCIPAL_KEY,
+                         zookeeperPrincipal);
                 Configuration conf = new Configuration();
                 conf.set("hadoop.security.authentication", "kerberos");
                 UserGroupInformation.setConfiguration(conf);
-                UserGroupInformation.loginUserFromKeytab(
-                        userName,
-                        userKeytabFile);
+                UserGroupInformation.loginUserFromKeytab(userName,
+                                                         userKeytabFile);
                 LoginUtil.login(userName, userKeytabFile, krb5File, this.conf);
             } catch (Exception e) {
                 LOG.error(e.getMessage());
