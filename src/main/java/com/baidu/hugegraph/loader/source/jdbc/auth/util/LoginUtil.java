@@ -24,6 +24,7 @@ import java.util.Map;
  * @since 8.0.0
  */
 public class LoginUtil {
+
     private static final Logger LOGGER =
             LoggerFactory.getLogger(LoginUtil.class);
 

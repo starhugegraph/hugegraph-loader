@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import java.util.Map;
 
 public class KerberosLogin implements Authentication {
+
     public static final Logger LOG = Log.logger(KerberosLogin.class);
 
     private static final String ZOOKEEPER_DEFAULT_LOGIN_CONTEXT_NAME = "Client";
@@ -77,28 +78,28 @@ public class KerberosLogin implements Authentication {
             }
             if (!StringUtils.isEmpty(sslEnable)) {
                 builder.append(";ssl=")
-                        .append(sslEnable);
+                       .append(sslEnable);
             }
             builder.append(";serviceDiscoveryMode=")
-                    .append(serviceDiscoveryMode)
-                    .append(";zooKeeperNamespace=")
-                    .append(zooKeeperNamespace);
+                   .append(serviceDiscoveryMode)
+                   .append(";zooKeeperNamespace=")
+                   .append(zooKeeperNamespace);
             if (!StringUtils.isEmpty(saslQop)) {
                 builder.append(";sasl.qop=")
-                        .append(saslQop);
+                       .append(saslQop);
             }
             builder.append(";auth=")
-                    .append(auth)
-                    .append(";principal=")
-                    .append(principal)
-                    .append(";");
+                   .append(auth)
+                   .append(";principal=")
+                   .append(principal)
+                   .append(";");
             LOG.info("builder:" + builder);
         } else {
             builder.append(";serviceDiscoveryMode=")
-                    .append(serviceDiscoveryMode)
-                    .append(";zooKeeperNamespace=")
-                    .append(zooKeeperNamespace)
-                    .append(";auth=none");
+                   .append(serviceDiscoveryMode)
+                   .append(";zooKeeperNamespace=")
+                   .append(zooKeeperNamespace)
+                   .append(";auth=none");
         }
         return builder.toString();
 
