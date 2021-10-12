@@ -48,10 +48,10 @@ public enum JDBCVendor {
             String schema = source.schema();
             if (schema != null) {
                 E.checkArgument(schema.equals(source.database()),
-                        "The schema(%s) is allowed to not " +
+                                "The schema(%s) is allowed to not " +
                                 "specified in %s vendor, if specified, " +
                                 "it must be same as the database(%s)",
-                          schema, this, source.database());
+                                schema, this, source.database());
             }
             return super.checkSchema(source);
         }
