@@ -49,8 +49,6 @@ public class JDBCSource extends AbstractSource {
     private String password;
     @JsonProperty("batch_size")
     private int batchSize = 500;
-    @JsonProperty("principal")
-    private String principal;
     @JsonProperty("properties")
     private Map<String,String> properties;
     @JsonProperty("principals")
@@ -119,9 +117,6 @@ public class JDBCSource extends AbstractSource {
         source.charset(this.charset());
         source.listFormat(this.listFormat());
         return source;
-    }
-    public String principal() {
-        return this.principal;
     }
 
     public Map<String,String> getProperties() {
