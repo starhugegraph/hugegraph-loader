@@ -47,10 +47,10 @@ public enum JDBCVendor {
             String schema = source.schema();
             if (schema != null) {
                 E.checkArgument(schema.equals(source.database()),
-                        "The schema(%s) is allowed to not " +
-                                "specified in %s vendor, if specified, " +
-                                "it must be same as the database(%s)",
-                        schema, this, source.database());
+                       "The schema(%s) is allowed to not " +
+                               "specified in %s vendor, if specified, " +
+                               "it must be same as the database(%s)",
+                         schema, this, source.database());
             }
             return super.checkSchema(source);
         }
@@ -62,8 +62,8 @@ public enum JDBCVendor {
                                  "WHERE TABLE_SCHEMA = %s " +
                                  "AND TABLE_NAME = %s " +
                                  "ORDER BY ORDINAL_POSITION;",
-                    this.escape(source.schema()),
-                    this.escape(source.table()));
+                                 this.escape(source.schema()),
+                                 this.escape(source.table()));
         }
 
         @Override
@@ -73,8 +73,8 @@ public enum JDBCVendor {
                                  "WHERE TABLE_SCHEMA = %s " +
                                  "AND TABLE_NAME = %s " +
                                  "AND COLUMN_KEY = 'PRI';",
-                    this.escape(source.schema()),
-                    this.escape(source.table()));
+                                 this.escape(source.schema()),
+                                 this.escape(source.table()));
         }
 
         @Override
@@ -102,9 +102,9 @@ public enum JDBCVendor {
                                  "AND TABLE_SCHEMA = %s " +
                                  "AND TABLE_NAME = %s " +
                                  "ORDER BY ORDINAL_POSITION;",
-                    this.escape(source.database()),
-                    this.escape(source.schema()),
-                    this.escape(source.table()));
+                                 this.escape(source.database()),
+                                 this.escape(source.schema()),
+                                 this.escape(source.table()));
         }
 
         @Override
@@ -116,8 +116,8 @@ public enum JDBCVendor {
                                  "AND a.attnum = ANY(i.indkey) " +
                                  "WHERE i.indrelid = '%s.%s'::regclass " +
                                  "AND i.indisprimary;",
-                    source.schema(),
-                    source.table());
+                                 source.schema(),
+                                 source.table());
         }
 
         @Override
@@ -171,17 +171,17 @@ public enum JDBCVendor {
                                  "cols.constraint_name " +
                                  "AND cons.owner = cols.owner " +
                                  "ORDER BY cols.table_name, cols.position",
-                    this.escape(source.table()));
+                                 this.escape(source.table()));
         }
 
         @Override
         public String buildSelectSql(JDBCSource source, Line nextStartRow) {
             StringBuilder builder = new StringBuilder();
             builder.append("SELECT * FROM ")
-                    .append("\"").append(source.schema()).append("\"")
-                    .append(".")
-                    .append("\"").append(source.table()).append("\"")
-                    .append(" WHERE ");
+                   .append("\"").append(source.schema()).append("\"")
+                   .append(".")
+                   .append("\"").append(source.table()).append("\"")
+                   .append(" WHERE ");
             if (nextStartRow != null) {
                 builder.append(this.buildGteClauseInFlattened(nextStartRow))
                        .append(" AND ");
@@ -210,7 +210,7 @@ public enum JDBCVendor {
         @Override
         public String checkSchema(JDBCSource source) {
             E.checkArgument(source.schema() != null,
-                    "The schema must be specified in %s vendor", this);
+                             "The schema must be specified in %s vendor", this);
             return source.schema();
         }
 
@@ -234,9 +234,9 @@ public enum JDBCVendor {
                                  "AND TABLE_SCHEMA = N%s " +
                                  "AND TABLE_NAME = N%s " +
                                  "ORDER BY ORDINAL_POSITION;",
-                    this.escape(source.database()),
-                    this.escape(source.schema()),
-                    this.escape(source.table()));
+                                 this.escape(source.database()),
+                                 this.escape(source.schema()),
+                                 this.escape(source.table()));
         }
 
         @Override
@@ -248,8 +248,8 @@ public enum JDBCVendor {
                                  "CONSTRAINT_NAME)), 'IsPrimaryKey') = 1" +
                                  "AND TABLE_SCHEMA = N%s " +
                                  "AND TABLE_NAME = N%s;",
-                    this.escape(source.schema()),
-                    this.escape(source.table()));
+                                 this.escape(source.schema()),
+                                 this.escape(source.table()));
         }
 
         @Override
