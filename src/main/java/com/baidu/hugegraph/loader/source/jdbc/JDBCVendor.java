@@ -19,12 +19,15 @@
 
 package com.baidu.hugegraph.loader.source.jdbc;
 
-import org.apache.http.client.utils.URIBuilder;
-
 import com.baidu.hugegraph.loader.constant.Constants;
-import com.baidu.hugegraph.loader.reader.line.Line;
 import com.baidu.hugegraph.loader.reader.jdbc.JDBCUtil;
+import com.baidu.hugegraph.loader.reader.line.Line;
+import com.baidu.hugegraph.loader.source.jdbc.auth.KerberosLogin;
 import com.baidu.hugegraph.util.E;
+import com.baidu.hugegraph.util.Log;
+import org.apache.commons.collections.MapUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
 
 public enum JDBCVendor {
 
@@ -302,6 +305,8 @@ public enum JDBCVendor {
 
     };
 
+    public static final Logger LOG = Log.logger(JDBCVendor.class);
+
     public abstract String defaultDriver();
 
     public abstract String defaultSchema(JDBCSource source);
@@ -318,15 +323,26 @@ public enum JDBCVendor {
         } else {
             url = String.format("%s/%s", url, source.database());
         }
-
-        URIBuilder uriBuilder = new URIBuilder();
-        uriBuilder.setPath(url)
-                  .setParameter("useSSL", "false")
-                  .setParameter("characterEncoding", Constants.CHARSET.name())
-                  .setParameter("rewriteBatchedStatements", "true")
-                  .setParameter("useServerPrepStmts", "false")
-                  .setParameter("autoReconnect", "true");
-        return uriBuilder.toString();
+        if (!MapUtils.isEmpty(source.getPrincipals())) {
+            StringBuilder builder = new StringBuilder(url);
+            try {
+                builder.append(new KerberosLogin().auth(source));
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+                return null;
+            }
+            return builder.toString();
+        } else {
+            URIBuilder uriBuilder = new URIBuilder();
+            uriBuilder.setPath(url)
+                      .setParameter("useSSL", "false")
+                      .setParameter("characterEncoding",
+                                    Constants.CHARSET.name())
+                      .setParameter("rewriteBatchedStatements", "true")
+                      .setParameter("useServerPrepStmts", "false")
+                      .setParameter("autoReconnect", "true");
+            return uriBuilder.toString();
+        }
     }
 
     public abstract String buildGetHeaderSql(JDBCSource source);
