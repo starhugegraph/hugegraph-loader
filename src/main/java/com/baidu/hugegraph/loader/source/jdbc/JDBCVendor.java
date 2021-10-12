@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 public enum JDBCVendor {
 
     MYSQL {
+
         @Override
         public String defaultDriver() {
             return "com.mysql.cj.jdbc.Driver";
@@ -50,7 +51,7 @@ public enum JDBCVendor {
                         "The schema(%s) is allowed to not " +
                                 "specified in %s vendor, if specified, " +
                                 "it must be same as the database(%s)",
-                         schema, this, source.database());
+                          schema, this, source.database());
             }
             return super.checkSchema(source);
         }
@@ -84,6 +85,7 @@ public enum JDBCVendor {
     },
 
     POSTGRESQL {
+
         @Override
         public String defaultDriver() {
             return "org.postgresql.Driver";
@@ -127,6 +129,7 @@ public enum JDBCVendor {
     },
 
     ORACLE {
+
         @Override
         public String defaultDriver() {
             return "oracle.jdbc.driver.OracleDriver";
@@ -197,6 +200,7 @@ public enum JDBCVendor {
     },
 
     SQLSERVER {
+
         @Override
         public String defaultDriver() {
             return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
