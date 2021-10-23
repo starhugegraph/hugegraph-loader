@@ -23,11 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
@@ -58,7 +58,7 @@ public final class LoadProgress  {
     public LoadProgress() {
         this.vertexLoaded = 0L;
         this.edgeLoaded = 0L;
-        this.inputProgress = new LinkedHashMap<>();
+        this.inputProgress = Collections.synchronizedMap(new LinkedHashMap<>());
     }
 
     public long vertexLoaded() {
@@ -84,12 +84,16 @@ public final class LoadProgress  {
     public long totalInputReaded() {
         long count = 0L;
         for (InputProgress inputProgress : this.inputProgress.values()) {
-            Set<InputItemProgress> itemProgresses = inputProgress.loadedItems();
-            for (InputItemProgress itemProgress : itemProgresses) {
+            Map<String, InputItemProgress> itemProgresses =
+                                           inputProgress.loadedItems();
+            for (InputItemProgress itemProgress : itemProgresses.values()) {
                 count += itemProgress.offset();
             }
-            if (inputProgress.loadingItem() != null) {
-                count += inputProgress.loadingItem().offset();
+            if (!inputProgress.loadingItems().isEmpty()) {
+                for (InputItemProgress item :
+                     inputProgress.loadingItems().values()) {
+                    count += item.offset();
+                }
             }
         }
         return count;
@@ -108,7 +112,7 @@ public final class LoadProgress  {
     public void markLoaded(InputStruct struct, boolean markAll) {
         InputProgress progress = this.inputProgress.get(struct.id());
         E.checkArgumentNotNull(progress, "Invalid mapping '%s'", struct);
-        progress.markLoaded(markAll);
+        progress.markLoaded();
     }
 
     public void write(LoadContext context) throws IOException {
