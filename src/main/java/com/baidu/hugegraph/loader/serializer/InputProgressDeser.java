@@ -56,7 +56,7 @@ public class InputProgressDeser extends JsonDeserializer<InputProgress> {
         String type = typeNode.asText().toUpperCase();
         SourceType sourceType = SourceType.valueOf(type);
         JsonNode loadedItemsNode = getNode(node, FIELD_LOADED_ITEMS,
-                                           JsonNodeType.ARRAY);
+                                           JsonNodeType.OBJECT);
         JsonNode loadingItemsNode = getNode(node, FIELD_LOADING_ITEM,
                                            JsonNodeType.OBJECT,
                                            JsonNodeType.NULL);
