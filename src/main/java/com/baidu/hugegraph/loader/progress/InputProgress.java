@@ -107,9 +107,10 @@ public final class InputProgress {
         }
         if (readable != null) {
             String name = readable.name();
-            InputItemProgress item = this.loadingItem(readable.name());
-            this.loadingItems.remove(name);
-            this.loadedItems.put(name, item);
+            InputItemProgress item = this.loadingItems.remove(name);
+            if (item != null) {
+                this.loadedItems.put(name, item);
+            }
             return;
         }
         if (!this.loadingItems.isEmpty()) {
