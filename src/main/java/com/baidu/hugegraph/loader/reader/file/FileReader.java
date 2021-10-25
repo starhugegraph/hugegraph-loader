@@ -68,6 +68,17 @@ public abstract class FileReader extends AbstractReader {
         this.readables = readables;
     }
 
+    public Readable readable() {
+        if (this.readable != null) {
+            return this.readable;
+        }
+        if (this.readables.hasNext()) {
+            this.readable = this.readables.next();
+            return this.readable;
+        }
+        return null;
+    }
+
     @Override
     public boolean multiReaders() {
         return true;

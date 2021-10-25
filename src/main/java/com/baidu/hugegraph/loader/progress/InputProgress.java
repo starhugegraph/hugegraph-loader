@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.baidu.hugegraph.loader.mapping.InputStruct;
+import com.baidu.hugegraph.loader.reader.Readable;
 import com.baidu.hugegraph.loader.source.SourceType;
 import com.baidu.hugegraph.util.InsertionOrderUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -90,17 +91,27 @@ public final class InputProgress {
         return null;
     }
 
-    public void addLoadedItem(String name,
-                              InputItemProgress inputItemProgress) {
+    public synchronized void addLoadedItem(
+                             String name, InputItemProgress inputItemProgress) {
         this.loadedItems.put(name,  inputItemProgress);
     }
 
-    public void addLoadingItem(String name,
-                               InputItemProgress inputItemProgress) {
+    public synchronized void addLoadingItem(
+                             String name, InputItemProgress inputItemProgress) {
         this.loadingItems.put(name, inputItemProgress);
     }
 
-    public void markLoaded() {
+    public synchronized void markLoaded(Readable readable, boolean markAll) {
+        if (!markAll) {
+            return;
+        }
+        if (readable != null) {
+            String name = readable.name();
+            InputItemProgress item = this.loadingItem(readable.name());
+            this.loadingItems.remove(name);
+            this.loadedItems.put(name, item);
+            return;
+        }
         if (!this.loadingItems.isEmpty()) {
             this.loadedItems.putAll(this.loadingItems);
             this.loadingItems.clear();

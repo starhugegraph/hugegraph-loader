@@ -36,6 +36,9 @@ import com.baidu.hugegraph.loader.exception.LoadException;
 import com.baidu.hugegraph.loader.executor.LoadContext;
 import com.baidu.hugegraph.loader.executor.LoadOptions;
 import com.baidu.hugegraph.loader.mapping.InputStruct;
+import com.baidu.hugegraph.loader.reader.InputReader;
+import com.baidu.hugegraph.loader.reader.Readable;
+import com.baidu.hugegraph.loader.reader.file.FileReader;
 import com.baidu.hugegraph.loader.util.JsonUtil;
 import com.baidu.hugegraph.loader.util.LoadUtil;
 import com.baidu.hugegraph.util.E;
@@ -109,10 +112,15 @@ public final class LoadProgress  {
         return this.inputProgress.get(id);
     }
 
-    public void markLoaded(InputStruct struct, boolean markAll) {
+    public void markLoaded(InputStruct struct, InputReader reader,
+                           boolean finish) {
         InputProgress progress = this.inputProgress.get(struct.id());
+        Readable readable = null;
+        if (reader instanceof FileReader) {
+            readable = ((FileReader) reader).readable();
+        }
         E.checkArgumentNotNull(progress, "Invalid mapping '%s'", struct);
-        progress.markLoaded();
+        progress.markLoaded(readable, finish);
     }
 
     public void write(LoadContext context) throws IOException {
