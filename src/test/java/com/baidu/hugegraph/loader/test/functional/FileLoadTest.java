@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -2048,7 +2049,8 @@ public class FileLoadTest extends LoadTest {
         Assert.assertEquals(2, inputProgressMap.size());
         inputProgressMap.forEach((id, inputProgress) -> {
             if (id.equals("1")) {
-                Set<InputItemProgress> loadedItems = inputProgress.loadedItems();
+                Collection<InputItemProgress> loadedItems =
+                        inputProgress.loadedItems().values();
                 Assert.assertEquals(1, loadedItems.size());
 
                 InputItemProgress loadedItem = loadedItems.iterator().next();
@@ -2100,7 +2102,8 @@ public class FileLoadTest extends LoadTest {
         Assert.assertEquals(2, inputProgressMap.size());
         inputProgressMap.forEach((id, inputProgress) -> {
             if (id.equals("1")) {
-                Set<InputItemProgress> loadedItems = inputProgress.loadedItems();
+                Collection<InputItemProgress> loadedItems =
+                        inputProgress.loadedItems().values();
                 Assert.assertEquals(1, loadedItems.size());
 
                 InputItemProgress loadedItem = loadedItems.iterator().next();
@@ -2110,7 +2113,8 @@ public class FileLoadTest extends LoadTest {
                 // Reached last line: "li,nary",26,"Wu,han"
                 Assert.assertEquals(6, fileItem.offset());
             } else if (id.equals("2")) {
-                Set<InputItemProgress> loadedItems = inputProgress.loadedItems();
+                Collection<InputItemProgress> loadedItems =
+                        inputProgress.loadedItems().values();
                 Assert.assertEquals(1, loadedItems.size());
 
                 InputItemProgress loadedItem = loadedItems.iterator().next();
@@ -2175,7 +2179,8 @@ public class FileLoadTest extends LoadTest {
         Assert.assertEquals(2, inputProgressMap.size());
         inputProgressMap.forEach((id, inputProgress) -> {
             if (id.equals("1")) {
-                Set<InputItemProgress> loadedItems = inputProgress.loadedItems();
+                Collection<InputItemProgress> loadedItems =
+                        inputProgress.loadedItems().values();
                 Assert.assertEquals(1, loadedItems.size());
 
                 InputItemProgress loadedItem = loadedItems.iterator().next();
@@ -2183,7 +2188,8 @@ public class FileLoadTest extends LoadTest {
                 FileItemProgress fileItem = (FileItemProgress) loadedItem;
                 Assert.assertEquals(2, fileItem.offset());
             } else if (id.equals("2")) {
-                Set<InputItemProgress> loadedItems = inputProgress.loadedItems();
+                Collection<InputItemProgress> loadedItems =
+                        inputProgress.loadedItems().values();
                 Assert.assertEquals(1, loadedItems.size());
 
                 InputItemProgress loadedItem = loadedItems.iterator().next();
@@ -2237,7 +2243,8 @@ public class FileLoadTest extends LoadTest {
         inputProgressMap.forEach((id, value) -> {
             if (id.equals("2")) {
                 // The error line is exactly last line
-                Set<InputItemProgress> loadedItems = value.loadedItems();
+                Collection<InputItemProgress> loadedItems =
+                        value.loadedItems().values();
                 Assert.assertEquals(1, loadedItems.size());
 
                 InputItemProgress loadedItem = loadedItems.iterator().next();

@@ -103,4 +103,9 @@ public class JDBCReader extends AbstractReader {
     public void close() {
         this.fetcher.close();
     }
+
+    @Override
+    public boolean multiReaders() {
+        return false;
+    }
 }
