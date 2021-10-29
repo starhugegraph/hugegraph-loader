@@ -99,9 +99,9 @@ public class BatchInsertTask extends InsertTask {
         // TODO：need to write to error log when when insertBatch fails
         int count = this.batch.size();
         // This metrics just for current element mapping
-        this.plusLoadSuccess(count);
+        long total = this.plusLoadSuccess(count);
         Printer.printProgress(this.context, this.type(),
-                              BATCH_PRINT_FREQ, count);
+                              BATCH_PRINT_FREQ, count, total);
     }
 
     private int waitThenRetry(int retryCount, RuntimeException e) {

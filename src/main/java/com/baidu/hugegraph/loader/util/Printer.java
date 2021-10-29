@@ -70,7 +70,7 @@ public final class Printer {
         // Just log vertices/edges metrics
         log(DIVIDE_LINE + "\ndetail metrics");
         summary.inputMetricsMap().forEach((id, metrics) -> {
-            log(EMPTY_LINE + format("\ninput-struct '%s'", id) +
+            log(EMPTY_LINE + String.format("\ninput-struct '%s'", id) +
                 format("\nread success", metrics.readSuccess()) +
                 format("\nread failure", metrics.readFailure()));
             metrics.vertexMetrics().forEach((label, labelMetrics) -> {
@@ -90,14 +90,13 @@ public final class Printer {
         });
 
         // Print and log total vertices/edges metrics
-        printAndLog(DIVIDE_LINE + "\n" +
-                 getCountReport(LoadReport.collect(summary)) +
-                "\n" + DIVIDE_LINE);
+        printCountReport(LoadReport.collect(summary));
         printMeterReport(summary);
     }
-    private static String getCountReport(LoadReport r) {
+
+    private static void printCountReport(LoadReport r) {
         // for multi-thread output
-        String sb = "count metrics" +
+        String sb = DIVIDE_LINE + "\ncount metrics" +
                 format("\ninput read success", r.readSuccess()) +
                 format("\ninput read failure", r.readFailure()) +
                 format("\nvertex parse success", r.vertexParseSuccess()) +
@@ -108,10 +107,8 @@ public final class Printer {
                 format("\nedge parse failure", r.edgeParseFailure()) +
                 format("\nedge insert success", r.edgeInsertSuccess()) +
                 format("\nedge insert failure", r.edgeInsertFailure());
-        return sb;
-    }
-    private static void printCountReport(LoadReport r) {
-        printAndLog(getCountReport(r));
+
+        printAndLog(sb);
     }
 
     private static void printMeterReport(LoadSummary summary) {
@@ -120,7 +117,7 @@ public final class Printer {
         long readTime = totalTime - loadTime;
 
         // for multi-thread output
-        String sb = "meter metrics" +
+        String sb = DIVIDE_LINE + "\nmeter metrics" +
                 format("\ntotal time", TimeUtil.readableTime(totalTime)) +
                 format("\nread time", TimeUtil.readableTime(readTime)) +
                 format("\nload time", TimeUtil.readableTime(loadTime)) +
@@ -154,10 +151,14 @@ public final class Printer {
         // Print an empty line
         System.err.println();
         System.err.println(formatMsg);
+        if (e.getCause() != null) {
+            formatMsg = String.format("Detail: %s", e.getCause().getMessage());
+            System.err.println(formatMsg);
+        }
     }
 
     public static void printProgress(LoadContext context, ElemType type,
-                                     long frequency, int batchSize) {
+                                     long freq, int batchSize, long total) {
         LoadSummary summary = context.summary();
         if (context.options().printProgress) {
             Printer.printInBackward(summary.vertex().getCount(),
@@ -166,12 +167,11 @@ public final class Printer {
 
         LoadSummary.LoadRater rater =
                 type.isVertex() ? summary.vertex() : summary.edge();
-        if (rater.getCount() % frequency < batchSize &&
-                (rater.curRate() != 0 || rater.getCount() == 0)) {
+        if (total % freq < batchSize && total > 0 ) {
             LOG.info("{} loaded: {}, " +
                             "average rate: {}/s, cur rate: {}/s, " +
                             "average queue: {}, cur queue: {}",
-                    type.string(), rater.getCount(),
+                    type.string(), total,
                     rater.avgRate(), rater.curRate(),
                     summary.getAvgTaskQueueLen(), summary.getTaskQueueLen());
         }
