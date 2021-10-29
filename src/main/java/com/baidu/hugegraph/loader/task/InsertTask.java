@@ -100,14 +100,14 @@ public abstract class InsertTask implements Runnable {
 
     public abstract void execute();
 
-    protected void plusLoadSuccess(int count) {
+    protected long plusLoadSuccess(int count) {
         LoadMetrics metrics = this.summary().metrics(this.struct);
         metrics.plusInsertSuccess(this.mapping, count);
-        this.summary().plusLoaded(this.type(), count);
+        return this.summary().plusLoaded(this.type(), count);
     }
 
-    protected void increaseLoadSuccess() {
-        this.plusLoadSuccess(1);
+    protected long increaseLoadSuccess() {
+        return this.plusLoadSuccess(1);
     }
 
     @SuppressWarnings("unchecked")
