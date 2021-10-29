@@ -50,8 +50,9 @@ public final class LoadSummary {
             this.prevCost = new AtomicLong();
         }
 
-        public void addCount(long value) {
+        public long addCount(long value) {
             this.count.add(value);
+            return this.count.longValue();
         }
 
         public void addTimeRange(long start, long end) {
@@ -155,11 +156,11 @@ public final class LoadSummary {
         return this.edgeRater;
     }
 
-    public void plusLoaded(ElemType type, int count) {
+    public long plusLoaded(ElemType type, int count) {
         if (type.isVertex()) {
-            this.vertexRater.addCount(count);
+            return this.vertexRater.addCount(count);
         } else {
-            this.edgeRater.addCount(count);
+            return this.edgeRater.addCount(count);
         }
     }
 

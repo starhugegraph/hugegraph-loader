@@ -47,6 +47,7 @@ public class SingleInsertTask extends InsertTask {
 
     @Override
     public void execute() {
+        long total = this.plusLoadSuccess(0);
         for (Record record : this.batch) {
             try {
                 if (this.mapping.updateStrategies().isEmpty()) {
@@ -54,7 +55,7 @@ public class SingleInsertTask extends InsertTask {
                 } else {
                     this.updateSingle(this.options(), record);
                 }
-                this.increaseLoadSuccess();
+                total = this.increaseLoadSuccess();
             } catch (Exception e) {
                 this.metrics().increaseInsertFailure(this.mapping);
                 InsertException ie = new InsertException(record.rawLine(), e);
@@ -62,7 +63,7 @@ public class SingleInsertTask extends InsertTask {
             }
         }
         Printer.printProgress(this.context, this.type(),
-                              SINGLE_PRINT_FREQ, this.batch.size());
+                              SINGLE_PRINT_FREQ, this.batch.size(), total);
     }
 
     private void handleInsertFailure(InsertException e) {
