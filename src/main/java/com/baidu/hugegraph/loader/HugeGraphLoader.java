@@ -233,10 +233,15 @@ public final class HugeGraphLoader {
 
             // Create and init InputReader, fetch next batch lines
             try {
+                LOG.info("Start loading: '{}'", struct);
+
                 InputReader reader = InputReader.create(struct.input());
                 List<InputReader> readerList = reader.multiReaders() ?
                                                reader.split() :
                                                ImmutableList.of(reader);
+
+                LOG.info("total {} found in '{}'", readerList.size(), struct);
+
                 for (InputReader r : readerList) {
                     // Init reader
                     r.init(this.context, struct);
@@ -273,7 +278,7 @@ public final class HugeGraphLoader {
      * Let load task worked in pipeline mode
      */
     private void loadStruct(InputStruct struct, InputReader reader) {
-        LOG.info("Start loading '{}'", struct);
+//        LOG.info("Start loading '{}'", struct);
         LoadMetrics metrics = this.context.summary().metrics(struct);
         metrics.startInFlight();
 
@@ -321,7 +326,7 @@ public final class HugeGraphLoader {
         }
 
         metrics.stopInFlight();
-        LOG.info("Finish loading '{}'", struct);
+//        LOG.info("Finish loading '{}'", struct);
     }
 
     /**
