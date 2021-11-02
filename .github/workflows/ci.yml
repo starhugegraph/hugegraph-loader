@@ -55,6 +55,7 @@ jobs:
 
       - name: Prepare env and service
         run: |
+          $TRAVIS_DIR/install-etcd.sh
           $TRAVIS_DIR/install-hadoop.sh
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASS }}
