@@ -10,9 +10,9 @@ fi
 BRANCH_ID=$1
 HUGEGRAPH_GIT_URL="https://github.com/starhugegraph/hugegraph.git"
 
-git checkout -b gh-pre-release origin/gh-pre-release
+git clone ${HUGEGRAPH_GIT_URL}
 cd hugegraph
-git checkout -b ${BRANCH_ID}
+git checkout -b gh-pre-release origin/gh-pre-release
 mvn package -DskipTests
 mv hugegraph-*.tar.gz ../
 cd ../
