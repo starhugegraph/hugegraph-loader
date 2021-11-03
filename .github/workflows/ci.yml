@@ -23,7 +23,7 @@ jobs:
       TRAVIS_DIR: assembly/travis
       STATIC_DIR: assembly/static
       COMMIT_ID: e65641517361d7da7ef1801489c15e3af7863a39
-      BRANCH_ID: gh-master
+      BRANCH_ID: gh-pre-release
       DB_USER: root
       DB_PASS: root
       DB_DATABASE: load_test
@@ -49,11 +49,13 @@ jobs:
       - name: Compile
         run: |
           mvn install:install-file -Dfile=$STATIC_DIR/lib/ojdbc8-12.2.0.1.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=12.2.0.1 -Dpackaging=jar
-          mvn install:install-file -Dfile=$STATIC_DIR/lib/hugegraph-client-1.9.7.jar -DgroupId=com.baidu.hugegraph -DartifactId=hugegraph-client -Dversion=1.9.7 -Dpackaging=jar
+          mvn install:install-file -Dfile=$STATIC_DIR/lib/hugegraph-common-1.8.9.jar -DgroupId=com.baidu.hugegraph -DartifactId=hugegraph-common -Dversion=1.8.9 -Dpackaging=jar -DpomFile=$STATIC_DIR/lib/common-pom.xml
+          mvn install:install-file -Dfile=$STATIC_DIR/lib/hugegraph-client-1.9.7.jar -DgroupId=com.baidu.hugegraph -DartifactId=hugegraph-client -Dversion=1.9.7 -Dpackaging=jar -DpomFile=$STATIC_DIR/lib/client-pom.xml
           mvn compile -Dmaven.javadoc.skip=true | grep -v "Downloading\|Downloaded"
 
       - name: Prepare env and service
         run: |
+          $TRAVIS_DIR/install-etcd.sh
           $TRAVIS_DIR/install-hadoop.sh
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASS }}
