@@ -214,8 +214,9 @@ public final class HugeGraphLoader {
             parallelCount = structs.size();
         }
 
-        LOG.info("{} threads for loading {} structs",
-                parallelCount, structs.size());
+        LOG.info("{} threads for loading {} structs, from {} to {}",
+                parallelCount, structs.size(), this.context.options().startFile,
+                this.context.options().endFile);
 
         ExecutorService service = ExecutorUtil.newFixedThreadPool(
                 parallelCount, "loader");
@@ -223,6 +224,7 @@ public final class HugeGraphLoader {
         List<CompletableFuture<Void>> loadTasks = new ArrayList<>();
         List<InputReader> readers = new ArrayList<>();
 
+        int curFile = 0;
         for (InputStruct struct : structs) {
             if (this.context.stopped()) {
                 break;
@@ -243,11 +245,22 @@ public final class HugeGraphLoader {
                 LOG.info("total {} found in '{}'", readerList.size(), struct);
 
                 for (InputReader r : readerList) {
-                    // Init reader
-                    r.init(this.context, struct);
-                    // Load data from current input mapping
-                    loadTasks.add(this.asyncLoadStruct(struct, r, service));
-                    readers.add(r);
+                    if (curFile >= this.context.options().startFile &&
+                        (this.context.options().endFile == -1 ||
+                        curFile < this.context.options().endFile )) {
+                        // Init reader
+                        r.init(this.context, struct);
+                        // Load data from current input mapping
+                        loadTasks.add(this.asyncLoadStruct(struct, r, service));
+                        readers.add(r);
+                    } else {
+                        r.close();
+                    }
+                    curFile += 1;
+                }
+                if (this.context.options().endFile != -1 &&
+                    curFile >= this.context.options().endFile) {
+                    break;
                 }
             } catch (InitException e) {
                 throw new LoadException("Failed to init input reader", e);
