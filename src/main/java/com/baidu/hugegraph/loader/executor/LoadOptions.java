@@ -146,6 +146,10 @@ public final class LoadOptions {
             description = "end file index for partial loading")
     public int endFile = -1;
 
+    @Parameter(names = {"--scatter-sources"}, arity = 1,
+            description = "scatter multiple sources for io optimize")
+    public boolean scatterSources = false;
+
     @Parameter(names = {"--shutdown-timeout"}, arity = 1,
             validateWith = {PositiveValidator.class},
             description = "The timeout of awaitTermination in seconds")
