@@ -22,6 +22,7 @@ package com.baidu.hugegraph.loader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -64,6 +65,20 @@ public final class HugeGraphLoader {
     private final LoadContext context;
     private final LoadMapping mapping;
     private final TaskManager manager;
+
+    public static class InputTaskItem {
+        public final InputReader reader;
+        public final InputStruct struct;
+        public final int structIndex;
+        public final int seqNumber;
+        public InputTaskItem(InputStruct struct, InputReader reader,
+                             int structIndex, int seq) {
+            this.struct = struct;
+            this.reader = reader;
+            this.structIndex = structIndex;
+            this.seqNumber = seq;
+        }
+    }
 
     public static void main(String[] args) {
         HugeGraphLoader loader;
@@ -204,6 +219,66 @@ public final class HugeGraphLoader {
         }
     }
 
+    private List<InputTaskItem> prepareTaskItems(List<InputStruct> structs,
+                                                 boolean scatter) {
+        ArrayList<InputTaskItem> tasks = new ArrayList<>();
+        int curFile = 0;
+        int curIndex = 0;
+        for (InputStruct struct : structs) {
+            if (struct.skip()) {
+                continue;
+            }
+
+            // Create and init InputReader
+            try {
+                LOG.info("Start loading: '{}'", struct);
+
+                InputReader reader = InputReader.create(struct.input());
+                List<InputReader> readerList = reader.multiReaders() ?
+                        reader.split() :
+                        ImmutableList.of(reader);
+
+                LOG.info("total {} found in '{}'", readerList.size(), struct);
+                tasks.ensureCapacity(tasks.size() + readerList.size());
+                int seq = 0;
+                for (InputReader r : readerList) {
+                    if (curFile >= this.context.options().startFile &&
+                        (this.context.options().endFile == -1 ||
+                            curFile < this.context.options().endFile )) {
+                        // Load data from current input mapping
+                        tasks.add(new InputTaskItem(struct, r, seq, curIndex));
+                    } else {
+                        r.close();
+                    }
+                    seq += 1;
+                    curFile += 1;
+                }
+                if (this.context.options().endFile != -1 &&
+                        curFile >= this.context.options().endFile) {
+                    break;
+                }
+            } catch (InitException e) {
+                throw new LoadException("Failed to init input reader", e);
+            }
+            curIndex += 1;
+        }
+        // sort by seqNumber to allow scatter loading from different sources
+        if (scatter) {
+            tasks.sort(new Comparator<InputTaskItem>() {
+                @Override
+                public int compare(InputTaskItem o1, InputTaskItem o2) {
+                    if (o1.structIndex == o2.structIndex) {
+                        return o1.seqNumber - o2.seqNumber;
+                    } else {
+                        return o1.structIndex - o2.structIndex;
+                    }
+                }
+            });
+        }
+
+        return tasks;
+    }
+
     private void loadStructs(List<InputStruct> structs) {
         int parallelCount = this.context.options().parallelCount;
         if (structs.size() == 0) {
@@ -213,45 +288,28 @@ public final class HugeGraphLoader {
             parallelCount = structs.size();
         }
 
-        LOG.info("{} threads for loading {} structs",
-                parallelCount, structs.size());
+        boolean scatter = this.context.options().scatterSources;
+
+        LOG.info("{} threads for loading {} structs, from {} to {} in {} mode",
+                parallelCount, structs.size(), this.context.options().startFile,
+                this.context.options().endFile,
+                 scatter ? "scatter" : "sequencial");
 
         ExecutorService service = ExecutorUtil.newFixedThreadPool(
                 parallelCount, "loader");
 
+        List<InputTaskItem> taskItems = prepareTaskItems(structs, scatter);
+
         List<CompletableFuture<Void>> loadTasks = new ArrayList<>();
-        List<InputReader> readers = new ArrayList<>();
 
-        for (InputStruct struct : structs) {
-            if (this.context.stopped()) {
-                break;
-            }
-            if (struct.skip()) {
-                continue;
-            }
-
-            // Create and init InputReader, fetch next batch lines
-            try {
-                LOG.info("Start loading: '{}'", struct);
-
-                InputReader reader = InputReader.create(struct.input());
-                List<InputReader> readerList = reader.multiReaders() ?
-                                               reader.split() :
-                                               ImmutableList.of(reader);
-
-                LOG.info("total {} found in '{}'", readerList.size(), struct);
-
-                for (InputReader r : readerList) {
-                    // Init reader
-                    r.init(this.context, struct);
-                    // Load data from current input mapping
-                    loadTasks.add(this.asyncLoadStruct(struct, r, service));
-                    readers.add(r);
-                }
-            } catch (InitException e) {
-                throw new LoadException("Failed to init input reader", e);
-            }
+        for (InputTaskItem item : taskItems ) {
+            // Init reader
+            item.reader.init(this.context, item.struct);
+            // Load data from current input mapping
+            loadTasks.add(
+                    this.asyncLoadStruct(item.struct, item.reader, service));
         }
+
         LOG.info("waiting for loading finish {}", loadTasks.size());
         // wait for finish
         CompletableFuture.allOf(loadTasks.toArray(new CompletableFuture[0]))
@@ -259,8 +317,8 @@ public final class HugeGraphLoader {
 
         service.shutdown();
 
-        for (InputReader reader : readers) {
-            reader.close();
+        for (InputTaskItem item : taskItems) {
+            item.reader.close();
         }
         LOG.info("load finish");
     }
