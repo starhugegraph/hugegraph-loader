@@ -138,6 +138,18 @@ public final class LoadOptions {
             description = "The number of parallel read pipelines")
     public int parallelCount = 1;
 
+    @Parameter(names = {"--start-file"}, arity = 1,
+            description = "start file index for partial loading")
+    public int startFile = 0;
+
+    @Parameter(names = {"--end-file"}, arity = 1,
+            description = "end file index for partial loading")
+    public int endFile = -1;
+
+    @Parameter(names = {"--scatter-sources"}, arity = 1,
+            description = "scatter multiple sources for io optimize")
+    public boolean scatterSources = false;
+
     @Parameter(names = {"--shutdown-timeout"}, arity = 1,
             validateWith = {PositiveValidator.class},
             description = "The timeout of awaitTermination in seconds")
