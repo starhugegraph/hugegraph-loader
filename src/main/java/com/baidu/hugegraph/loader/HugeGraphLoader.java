@@ -397,7 +397,7 @@ public final class HugeGraphLoader {
         long end = System.currentTimeMillis();
         this.context.summary().addTimeRange(mapping.type(), start, end);
 
-        if (this.context.options().dryRun || CollectionUtils.isEmpty(batches)) {
+        if (CollectionUtils.isEmpty(batches)) {
             return;
         }
         // Async load
