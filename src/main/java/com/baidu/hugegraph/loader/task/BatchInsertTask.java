@@ -54,6 +54,9 @@ public class BatchInsertTask extends InsertTask {
     public void execute() {
         int retryCount = 0;
         do {
+            if (this.context.options().dryRun)
+                break;
+
             try {
                 if (this.mapping.updateStrategies().isEmpty()) {
                     this.insertBatch(this.batch, this.options().checkVertex);
