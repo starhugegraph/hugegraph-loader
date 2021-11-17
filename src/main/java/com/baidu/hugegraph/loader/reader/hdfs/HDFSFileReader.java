@@ -26,10 +26,10 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileChecksum;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 
@@ -127,10 +127,13 @@ public class HDFSFileReader extends FileReader {
             paths.add(new HDFSFile(this.hdfs, path));
         } else {
             assert this.hdfs.isDirectory(path);
-            FileStatus[] statuses = this.hdfs.listStatus(path);
-            Path[] subPaths = FileUtil.stat2Paths(statuses);
-            for (Path subPath : subPaths) {
-                if (filter.reserved(subPath.getName())) {
+
+            RemoteIterator<LocatedFileStatus> fileStatusListIterator =
+                    this.hdfs.listFiles(path, true);
+            while (fileStatusListIterator.hasNext()) {
+                LocatedFileStatus fileStatus = fileStatusListIterator.next();
+                Path subPath = fileStatus.getPath();
+                if (fileStatus.isFile() && filter.reserved(subPath.getName())) {
                     paths.add(new HDFSFile(this.hdfs, subPath));
                 }
             }

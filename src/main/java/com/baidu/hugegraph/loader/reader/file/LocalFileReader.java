@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,15 +69,14 @@ public class LocalFileReader extends FileReader {
             files.add(new LocalFile(file));
         } else {
             assert file.isDirectory();
-            File[] subFiles = file.listFiles();
-            if (subFiles == null) {
+            try {
+                Files.walk(file.toPath())
+                        .filter((x) -> Files.isRegularFile(x) &&
+                                filter.reserved(x.toString()))
+                        .forEach((x) -> files.add(new LocalFile(x.toFile())));
+            } catch (IOException e) {
                 throw new LoadException("Error while listing the files of " +
                                         "path '%s'", file);
-            }
-            for (File subFile : subFiles) {
-                if (filter.reserved(subFile.getName())) {
-                    files.add(new LocalFile(subFile));
-                }
             }
         }
         return files;
