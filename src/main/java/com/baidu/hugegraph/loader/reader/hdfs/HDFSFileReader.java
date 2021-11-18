@@ -45,6 +45,7 @@ import com.baidu.hugegraph.loader.reader.file.ParquetFileLineFetcher;
 import com.baidu.hugegraph.loader.source.InputSource;
 import com.baidu.hugegraph.loader.source.file.Compression;
 import com.baidu.hugegraph.loader.source.file.FileFilter;
+import com.baidu.hugegraph.loader.source.file.DirFilter;
 import com.baidu.hugegraph.loader.source.hdfs.HDFSSource;
 import com.baidu.hugegraph.loader.source.hdfs.KerberosConfig;
 import com.baidu.hugegraph.util.Log;
@@ -130,12 +131,57 @@ public class HDFSFileReader extends FileReader {
             FileStatus[] statuses = this.hdfs.listStatus(path);
             Path[] subPaths = FileUtil.stat2Paths(statuses);
             for (Path subPath : subPaths) {
-                if (filter.reserved(subPath.getName())) {
+                if (this.hdfs.isFile(subPath) && this.isReservedFile(subPath)) {
                     paths.add(new HDFSFile(this.hdfs, subPath));
+                }
+                if (this.hdfs.isDirectory(subPath)) {
+                    for (Path dirSubPath : this.listDirWithFilter(subPath)) {
+                        if (this.isReservedFile(dirSubPath)) {
+                            paths.add(new HDFSFile(this.hdfs, dirSubPath));
+                        }
+                    }
                 }
             }
         }
         return paths;
+    }
+
+    private boolean isReservedFile(Path path) throws IOException {
+        FileStatus status = this.hdfs.getFileStatus(path);
+        FileFilter filter = this.source().filter();
+
+        if (status.getLen() > 0 && filter.reserved(path.getName())) {
+            return true;
+        }
+        return false;
+    }
+
+    private List<Path> listDirWithFilter(Path dir) throws IOException {
+        DirFilter dirFilter = this.source().dirFilter();
+        List<Path> files  = new ArrayList<>();
+
+        if (this.hdfs.isFile(dir)) {
+            files.add(dir);
+        }
+
+        if (this.hdfs.isDirectory(dir) && dirFilter.reserved(dir.getName())) {
+            FileStatus[] statuses = this.hdfs.listStatus(dir);
+            Path[] subPaths = FileUtil.stat2Paths(statuses);
+            if (subPaths == null) {
+                throw new LoadException("Error while listing the files of " +
+                        "dir path '%s'", dir);
+            }
+            for (Path subFile : subPaths) {
+                if (this.hdfs.isFile(subFile)) {
+                    files.add(subFile);
+                }
+                if (this.hdfs.isDirectory(subFile)) {
+                    files.addAll(this.listDirWithFilter(subFile));
+                }
+            }
+        }
+
+        return files;
     }
 
     @Override
