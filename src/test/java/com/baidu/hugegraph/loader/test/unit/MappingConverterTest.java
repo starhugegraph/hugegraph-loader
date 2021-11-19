@@ -86,6 +86,7 @@ public class MappingConverterTest {
                 "\"structs\":[{\"id\":\"1\",\"skip\":false," +
                 "\"input\":{\"type\":\"FILE\",\"path\":\"users.dat\"," +
                 "\"file_filter\":{\"extensions\":[\"*\"]}," +
+                "\"dir_filter\":{\"include_regex\":\"\",\"exclude_regex\":\"\"}," +
                 "\"format\":\"TEXT\",\"delimiter\":\"::\"," +
                 "\"date_format\":\"yyyy-MM-dd HH:mm:ss\"," +
                 "\"time_zone\":\"GMT+8\",\"skipped_line\":{\"regex\":\"" +
@@ -103,6 +104,7 @@ public class MappingConverterTest {
                 "\"skip\":false,\"input\":{\"type\":\"FILE\"," +
                 "\"path\":\"ratings.dat\"," +
                 "\"file_filter\":{\"extensions\":[\"*\"]}," +
+                "\"dir_filter\":{\"include_regex\":\"\",\"exclude_regex\":\"\"}," +
                 "\"format\":\"TEXT\",\"delimiter\":\"::\"," +
                 "\"date_format\":\"yyyy-MM-dd HH:mm:ss\"," +
                 "\"time_zone\":\"GMT+8\",\"skipped_line\":{\"regex\":\"" +
