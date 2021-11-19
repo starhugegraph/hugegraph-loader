@@ -33,18 +33,18 @@ public class DirFilter {
 
     private Matcher includeMatcher() {
         if (this.includeMatcher == null &&
-                !StringUtils.isEmpty(this.includeRegex)) {
+            !StringUtils.isEmpty(this.includeRegex)) {
             this.includeMatcher = Pattern.compile(this.includeRegex)
-                    .matcher(Constants.EMPTY_STR);
+                                         .matcher(Constants.EMPTY_STR);
         }
         return this.includeMatcher;
     }
 
     private Matcher excludeMatcher() {
         if (this.excludeMatcher == null &&
-                !StringUtils.isEmpty(this.excludeRegex)) {
+            !StringUtils.isEmpty(this.excludeRegex)) {
             this.excludeMatcher = Pattern.compile(this.excludeRegex)
-                    .matcher(Constants.EMPTY_STR);
+                                         .matcher(Constants.EMPTY_STR);
         }
 
         return this.excludeMatcher;

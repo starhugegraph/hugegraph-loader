@@ -169,7 +169,7 @@ public class HDFSFileReader extends FileReader {
             Path[] subPaths = FileUtil.stat2Paths(statuses);
             if (subPaths == null) {
                 throw new LoadException("Error while listing the files of " +
-                        "dir path '%s'", dir);
+                                        "dir path '%s'", dir);
             }
             for (Path subFile : subPaths) {
                 if (this.hdfs.isFile(subFile)) {
