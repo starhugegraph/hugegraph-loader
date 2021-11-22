@@ -21,9 +21,11 @@ package com.baidu.hugegraph.loader.reader.hdfs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.FileStatus;
@@ -132,12 +134,14 @@ public class HDFSFileReader extends FileReader {
             Path[] subPaths = FileUtil.stat2Paths(statuses);
             for (Path subPath : subPaths) {
                 if (this.hdfs.isFile(subPath) && this.isReservedFile(subPath)) {
-                    paths.add(new HDFSFile(this.hdfs, subPath));
+                    paths.add(new HDFSFile(this.hdfs, subPath,
+                                           this.source().path()));
                 }
                 if (this.hdfs.isDirectory(subPath)) {
                     for (Path dirSubPath : this.listDirWithFilter(subPath)) {
                         if (this.isReservedFile(dirSubPath)) {
-                            paths.add(new HDFSFile(this.hdfs, dirSubPath));
+                            paths.add(new HDFSFile(this.hdfs, dirSubPath,
+                                                   this.source().path()));
                         }
                     }
                 }
@@ -220,10 +224,16 @@ public class HDFSFileReader extends FileReader {
 
         private final FileSystem hdfs;
         private final Path path;
+        private final String inputPath;
 
         private HDFSFile(FileSystem hdfs, Path path) {
+            this(hdfs, path, null);
+        }
+
+        private HDFSFile(FileSystem hdfs, Path path, String inputpath) {
             this.hdfs = hdfs;
             this.path = path;
+            this.inputPath = inputpath;
         }
 
         public FileSystem hdfs() {
@@ -232,6 +242,17 @@ public class HDFSFileReader extends FileReader {
 
         @Override
         public String name() {
+            return this.relativeName();
+        }
+
+        private String relativeName() {
+            if (!StringUtils.isEmpty(inputPath) &&
+                Paths.get(inputPath).isAbsolute()) {
+                String strPath = this.path.toUri().getPath();
+                return Paths.get(inputPath)
+                            .relativize(Paths.get(strPath)).toString();
+            }
+
             return this.path.getName();
         }
 
