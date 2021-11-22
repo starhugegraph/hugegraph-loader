@@ -23,10 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 
 import com.baidu.hugegraph.loader.exception.LoadException;
@@ -76,12 +78,13 @@ public class LocalFileReader extends FileReader {
             }
             for (File subFile : subFiles) {
                 if (subFile.isFile() && this.isReservedFile(subFile)) {
-                    files.add(new LocalFile(subFile));
+                    files.add(new LocalFile(subFile, file.getAbsolutePath()));
                 }
                 if (subFile.isDirectory()) {
                     for (File dirSubFile : this.listDirWithFilter(subFile)) {
                         if (this.isReservedFile(dirSubFile)) {
-                            files.add(new LocalFile(dirSubFile));
+                            files.add(new LocalFile(dirSubFile,
+                                                    file.getAbsolutePath()));
                         }
                     }
                 }
@@ -155,9 +158,14 @@ public class LocalFileReader extends FileReader {
     private static class LocalFile implements Readable {
 
         private final File file;
+        private final String inputPath;
 
         public LocalFile(File file) {
+            this(file, null);
+        }
+        public LocalFile(File file, String inputPath) {
             this.file = file;
+            this.inputPath = inputPath;
         }
 
         public File file() {
@@ -166,7 +174,17 @@ public class LocalFileReader extends FileReader {
 
         @Override
         public String name() {
-            return this.file.getName();
+            return this.relativeName();
+        }
+
+        private String relativeName() {
+            if (!StringUtils.isEmpty(this.inputPath)) {
+                return Paths.get(inputPath)
+                            .relativize(Paths.get(this.file.toURI()))
+                            .toString();
+            }
+
+            return file.getName();
         }
 
         @Override
