@@ -49,7 +49,7 @@ jobs:
       - name: Compile
         run: |
           mvn install:install-file -Dfile=$STATIC_DIR/lib/ojdbc8-12.2.0.1.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=12.2.0.1 -Dpackaging=jar
-          mvn install:install-file -Dfile=$STATIC_DIR/lib/hugegraph-common-1.8.9.jar -DgroupId=com.baidu.hugegraph -DartifactId=hugegraph-common -Dversion=1.8.9 -Dpackaging=jar -DpomFile=$STATIC_DIR/lib/common-pom.xml
+          mvn install:install-file -Dfile=$STATIC_DIR/lib/hugegraph-common-1.8.10.jar -DgroupId=com.baidu.hugegraph -DartifactId=hugegraph-common -Dversion=1.8.10 -Dpackaging=jar -DpomFile=$STATIC_DIR/lib/common-pom.xml
           mvn install:install-file -Dfile=$STATIC_DIR/lib/hugegraph-client-1.9.7.jar -DgroupId=com.baidu.hugegraph -DartifactId=hugegraph-client -Dversion=1.9.7 -Dpackaging=jar -DpomFile=$STATIC_DIR/lib/client-pom.xml
           mvn install:install-file -Dfile=$STATIC_DIR/lib/log4j-core-2.15.0.jar -DgroupId=org.apache.logging.log4j -DartifactId=log4j-core -Dversion=2.15.0 -Dpackaging=jar -DpomFile=$STATIC_DIR/lib/log4j-core-2.15.0-pom.xml
           mvn compile -Dmaven.javadoc.skip=true | grep -v "Downloading\|Downloaded"
