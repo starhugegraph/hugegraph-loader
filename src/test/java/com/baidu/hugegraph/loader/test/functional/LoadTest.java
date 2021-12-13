@@ -36,6 +36,7 @@ import com.baidu.hugegraph.testutil.Assert;
 public class LoadTest {
 
     protected static final String CONFIG_PATH_PREFIX = "target/test-classes";
+    protected static final String GRAPHSPACE = "DEFAULT";
     protected static final String GRAPH = "hugegraph";
     protected static final String SERVER = "127.0.0.1";
     protected static final int PORT = 8080;
@@ -48,7 +49,9 @@ public class LoadTest {
     protected static final String HTTPS_PROTOCOL = "https";
     protected static final String TRUST_STORE_FILE =
                                   "assembly/travis/conf/hugegraph.truststore";
-    protected static final HugeClient CLIENT = HugeClient.builder(URL, "DEFAULT",  GRAPH)
+    protected static final HugeClient CLIENT = HugeClient.builder(URL,
+                                                                  GRAPHSPACE,
+                                                                  GRAPH)
                                                          .build();
 
     public static String configPath(String fileName) {

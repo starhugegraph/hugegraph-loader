@@ -54,6 +54,10 @@ public final class LoadOptions {
             description = "The schema file path which to create manually")
     public String schema;
 
+    @Parameter(names = {"--graphspace"}, required = false, arity = 1,
+            description = "The graphspace of the graph to load into")
+    public String graphSpace = "DEFAULT";
+
     @Parameter(names = {"-g", "--graph"}, required = true, arity = 1,
             description = "The namespace of the graph to load into")
     public String graph;
