@@ -154,6 +154,7 @@ public class OrcFileLineFetcher extends FileLineFetcher {
     private String[] parseHeader(StructObjectInspector inspector) {
         List<? extends StructField> fields = inspector.getAllStructFieldRefs();
         return fields.stream().map(StructField::getFieldName)
+                     .map((f) -> f.toLowerCase())
                      .collect(Collectors.toList())
                      .toArray(new String[]{});
     }
