@@ -173,7 +173,7 @@ public class ParquetFileLineFetcher extends FileLineFetcher {
         List<Type> fields = schema.getFields();
         String[] header = new String[fields.size()];
         for (int i = 0; i < fields.size(); i++) {
-            header[i] = fields.get(i).getName();
+            header[i] = fields.get(i).getName().toLowerCase();
         }
         return header;
     }
