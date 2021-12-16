@@ -3048,7 +3048,7 @@ public class FileLoadTest extends LoadTest {
 
         HugeClient httpsClient = null;
         try {
-            httpsClient = HugeClient.builder(HTTPS_URL, GRAPH)
+            httpsClient = HugeClient.builder(HTTPS_URL, "DEFAULT", GRAPH)
                                     .configSSL(TRUST_STORE_FILE, "hugegraph")
                                     .build();
             List<Vertex> vertices = httpsClient.graph().listVertices();

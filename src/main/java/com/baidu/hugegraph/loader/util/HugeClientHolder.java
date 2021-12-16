@@ -50,7 +50,7 @@ public final class HugeClientHolder {
                           options.username : options.graph;
         HugeClientBuilder builder;
         try {
-            builder = HugeClient.builder(address, options.graph)
+            builder = HugeClient.builder(address, "DEFAULT", options.graph)
                                 .configUser(username, options.token)
                                 .configTimeout(options.timeout)
                                 .configPool(options.maxConnections,

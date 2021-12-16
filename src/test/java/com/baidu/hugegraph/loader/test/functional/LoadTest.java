@@ -48,7 +48,7 @@ public class LoadTest {
     protected static final String HTTPS_PROTOCOL = "https";
     protected static final String TRUST_STORE_FILE =
                                   "assembly/travis/conf/hugegraph.truststore";
-    protected static final HugeClient CLIENT = HugeClient.builder(URL, GRAPH)
+    protected static final HugeClient CLIENT = HugeClient.builder(URL, "DEFAULT",  GRAPH)
                                                          .build();
 
     public static String configPath(String fileName) {
