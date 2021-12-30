@@ -62,7 +62,7 @@
         <dependency>
             <groupId>com.baidu.hugegraph</groupId>
             <artifactId>hugegraph-common</artifactId>
-            <version>1.8.9</version>
+            <version>1.8.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
@@ -415,6 +415,10 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>netty-common</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty-all</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
             </exclusions>

@@ -7,8 +7,8 @@ public class ClientTest {
     @Test
     public void testMetaHugeGraphFactory() {
         MetaHugeClientFactory factory =
-                new MetaHugeClientFactory(null, "http://localhost:2379");
+                MetaHugeClientFactory.connect(null, new String[]{"http://localhost:2379"});
 
-        factory.listGraphSpaces().stream().forEach(System.out::println);
+        factory.listGraphSpaces("hg").stream().forEach(System.out::println);
     }
 }
