@@ -54,7 +54,8 @@ public abstract class InsertTask implements Runnable {
     };
 
     public static final String[] SERVER_BUSY_MESSAGE = {
-            "The rest server is too busy to write"
+            "The rest server is too busy to write",
+            "The server is too busy to process the request"
     };
 
     protected final LoadContext context;
