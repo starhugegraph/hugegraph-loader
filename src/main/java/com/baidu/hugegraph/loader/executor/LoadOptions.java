@@ -101,6 +101,11 @@ public final class LoadOptions {
             description = "The timeout waiting for clearing all data ")
     public int clearTimeout = 240;
 
+    @Parameter(names = {"--flush-timeout"}, arity = 1,
+            validateWith = {PositiveValidator.class},
+            description = "The timeout waiting for flush all data ")
+    public int flushTimeout = 240;
+
     @Parameter(names = {"--incremental-mode"}, arity = 1,
             description = "Load data from the breakpoint of last time")
     public boolean incrementalMode = false;
