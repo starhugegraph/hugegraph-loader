@@ -182,6 +182,8 @@ public final class HugeClientHolder {
                                         options.host, options.port);
             }
             throw e;
+        } finally {
+            clientFactory.close();
         }
     }
 }
