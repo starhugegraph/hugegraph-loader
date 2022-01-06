@@ -48,9 +48,12 @@ fi
 CP=$(find -L ${LIB} -name 'log4j-slf4j-impl*.jar' | sort | tr '\n' ':')
 # Add the jars in lib that start with "hugegraph"
 CP="$CP":$(find -L ${LIB} -name 'hugegraph*.jar' | sort | tr '\n' ':')
+# Add the jars in lib that start with "protobuf-java"
+CP="$CP":$(find -L ${LIB} -name 'protobuf-java*.jar' | sort | tr '\n' ':')
 # Add the remaining jars in lib.
 CP="$CP":$(find -L ${LIB} -name '*.jar' \
                 \! -name 'hugegraph*' \
+                \! -name 'protobuf-java*' \
                 \! -name 'log4j-slf4j-impl*.jar' | sort | tr '\n' ':')
 
 export LOADER_CLASSPATH="${CLASSPATH:-}:$CP"

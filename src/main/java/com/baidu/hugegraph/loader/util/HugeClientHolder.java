@@ -21,10 +21,12 @@ package com.baidu.hugegraph.loader.util;
 
 import java.nio.file.Paths;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.baidu.hugegraph.driver.HugeClient;
 import com.baidu.hugegraph.driver.HugeClientBuilder;
+import com.baidu.hugegraph.driver.factory.MetaHugeClientFactory;
 import com.baidu.hugegraph.exception.ServerException;
 import com.baidu.hugegraph.loader.constant.Constants;
 import com.baidu.hugegraph.loader.exception.LoadException;
@@ -35,6 +37,10 @@ import com.baidu.hugegraph.util.E;
 public final class HugeClientHolder {
 
     public static HugeClient create(LoadOptions options) {
+        if (CollectionUtils.isNotEmpty(options.metaURL)) {
+            return createFromMeta(options);
+        }
+
         boolean useHttps = options.protocol != null &&
                            options.protocol.equals(LoadOptions.HTTPS_SCHEMA);
         String address = options.host + ":" + options.port;
@@ -50,7 +56,8 @@ public final class HugeClientHolder {
                           options.username : options.graph;
         HugeClientBuilder builder;
         try {
-            builder = HugeClient.builder(address, "DEFAULT", options.graph)
+            builder = HugeClient.builder(address, options.graphSpace,
+                                         options.graph)
                                 .configUser(username, options.token)
                                 .configTimeout(options.timeout)
                                 .configPool(options.maxConnections,
@@ -108,6 +115,75 @@ public final class HugeClientHolder {
                                         options.host, options.port);
             }
             throw e;
+        }
+    }
+
+    protected static HugeClient createFromMeta(LoadOptions options) {
+        String username = options.username != null ?
+                options.username : options.graph;
+        HugeClientBuilder builder;
+
+        MetaHugeClientFactory clientFactory;
+
+        MetaHugeClientFactory.MetaDriverType type
+                = MetaHugeClientFactory.MetaDriverType
+                                       .valueOf(options.metaType.toUpperCase());
+        if (StringUtils.isNotEmpty(options.metaCa)) {
+            clientFactory = MetaHugeClientFactory.connect(
+                    type,
+                    options.metaURL.toArray(new String[0]), options.metaCa,
+                    options.metaClientCa,
+                    options.metaClientKey);
+        } else {
+            clientFactory = MetaHugeClientFactory.connect(
+                    MetaHugeClientFactory.MetaDriverType.ETCD,
+                    options.metaURL.toArray(new String[0]));
+        }
+
+        try {
+            HugeClient client
+                    = clientFactory.createAuthClient(options.cluster,
+                                                     options.graphSpace,
+                                                     options.graph, null,
+                                                     options.username,
+                                                     options.token);
+            return client;
+        } catch (IllegalStateException e) {
+            String message = e.getMessage();
+            if (message != null && message.startsWith("The version")) {
+                throw new LoadException("The version of hugegraph-client and " +
+                                        "hugegraph-server don't match", e);
+            }
+            throw e;
+        } catch (ServerException e) {
+            String message = e.getMessage();
+            if (Constants.STATUS_UNAUTHORIZED == e.status() ||
+                    (message != null && message.startsWith("Authentication"))) {
+                throw new LoadException("Incorrect username or password", e);
+            }
+            throw e;
+        } catch (ClientException e) {
+            Throwable cause = e.getCause();
+            if (cause == null || cause.getMessage() == null) {
+                throw e;
+            }
+            String message = cause.getMessage();
+            if (message.contains("Connection refused")) {
+                throw new LoadException("The service %s:%s is unavailable", e,
+                                        options.host, options.port);
+            } else if (message.contains("java.net.UnknownHostException") ||
+                    message.contains("Host name may not be null")) {
+                throw new LoadException("The host %s is unknown", e,
+                                        options.host);
+            } else if (message.contains("connect timed out")) {
+                throw new LoadException("Connect service %s:%s timeout, " +
+                                        "please check service is available " +
+                                        "and network is unobstructed", e,
+                                        options.host, options.port);
+            }
+            throw e;
+        } finally {
+            clientFactory.close();
         }
     }
 }
