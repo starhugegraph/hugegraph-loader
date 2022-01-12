@@ -57,23 +57,24 @@ public final class InputProgress {
                             InsertionOrderUtil.newMap());
     }
 
-    public Map<String, InputItemProgress> loadedItems() {
+    public synchronized Map<String, InputItemProgress> loadedItems() {
         return this.loadedItems;
     }
 
-    public Map<String, InputItemProgress> loadingItems() {
+    public synchronized Map<String, InputItemProgress> loadingItems() {
         return this.loadingItems;
     }
 
-    public InputItemProgress loadedItem(String name) {
+    public synchronized InputItemProgress loadedItem(String name) {
         return this.loadedItems.get(name);
     }
 
-    public InputItemProgress loadingItem(String name) {
+    public synchronized InputItemProgress loadingItem(String name) {
         return this.loadingItems.get(name);
     }
 
-    public InputItemProgress matchLoadedItem(InputItemProgress inputItem) {
+    public synchronized InputItemProgress matchLoadedItem(InputItemProgress
+                                                                  inputItem) {
         for (InputItemProgress item : this.loadedItems.values()) {
             if (item.equals(inputItem)) {
                 return item;
@@ -82,7 +83,8 @@ public final class InputProgress {
         return null;
     }
 
-    public InputItemProgress matchLoadingItem(InputItemProgress inputItem) {
+    public synchronized InputItemProgress matchLoadingItem(InputItemProgress
+                                                                   inputItem) {
         for (InputItemProgress item : this.loadingItems.values()) {
             if (item.equals(inputItem)) {
                 return item;
@@ -119,7 +121,7 @@ public final class InputProgress {
         }
     }
 
-    public void confirmOffset() {
+    public synchronized void confirmOffset() {
         for (InputItemProgress item : this.loadingItems.values()) {
             item.confirmOffset();
         }
