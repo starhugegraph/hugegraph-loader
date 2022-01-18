@@ -156,9 +156,6 @@ public final class HugeGraphLoader {
             String script;
             try {
                 script = FileUtils.readFileToString(file, Constants.CHARSET);
-                if (script.contains("graph.schema()")) {
-                    script = script.replace("graph.schema()", "schema");
-                }
             } catch (IOException e) {
                 throw new LoadException("Failed to read schema file '%s'", e,
                                         options.schema);
