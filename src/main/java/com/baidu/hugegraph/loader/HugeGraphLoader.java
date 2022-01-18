@@ -30,7 +30,6 @@ import com.baidu.hugegraph.util.ExecutorUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.yarn.proto.HSClientProtocol;
 import org.slf4j.Logger;
 
 import com.baidu.hugegraph.driver.HugeClient;
