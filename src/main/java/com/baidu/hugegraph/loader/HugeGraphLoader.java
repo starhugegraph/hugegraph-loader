@@ -30,6 +30,7 @@ import com.baidu.hugegraph.util.ExecutorUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.yarn.proto.HSClientProtocol;
 import org.slf4j.Logger;
 
 import com.baidu.hugegraph.driver.HugeClient;
@@ -155,6 +156,9 @@ public final class HugeGraphLoader {
             String script;
             try {
                 script = FileUtils.readFileToString(file, Constants.CHARSET);
+                if (script.contains("graph.schema()")) {
+                    script = script.replace("graph.schema()", "schema");
+                }
             } catch (IOException e) {
                 throw new LoadException("Failed to read schema file '%s'", e,
                                         options.schema);
