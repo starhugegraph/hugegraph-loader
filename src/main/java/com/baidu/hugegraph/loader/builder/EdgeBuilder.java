@@ -38,6 +38,7 @@ import com.baidu.hugegraph.structure.schema.SchemaLabel;
 import com.baidu.hugegraph.structure.schema.VertexLabel;
 import com.baidu.hugegraph.util.E;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 
 public class EdgeBuilder extends ElementBuilder<Edge> {
 
@@ -192,8 +193,9 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
             int i = listNames.indexOf(field);
             if (i < 0) {
                 throw new LoadException("mapping file error: edges.source(%s)" +
-                                                " not in file header(%s)",
-                                        field, names);
+                                                " not in file header([%s])",
+                          field, StringUtils.joinWith(",",
+                                                                    names));
             }
             index.sourceIndexes[idx] = i;
         }
@@ -203,8 +205,9 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
             int i = listNames.indexOf(field);
             if (i < 0) {
                 throw new LoadException("mapping file error: edges.target(%s)" +
-                                                " not in file header(%s)",
-                                        field, names);
+                                                " not in file header([%s])",
+                                        field, StringUtils.joinWith(",",
+                                                                    names));
             }
             index.sourceIndexes[idx] = i;
         }
