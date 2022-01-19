@@ -328,11 +328,7 @@ public final class HugeGraphLoader {
     private CompletableFuture<Void> asyncLoadStruct(
             InputStruct struct, InputReader reader, ExecutorService service) {
         return CompletableFuture.runAsync(() -> {
-            try {
                 this.loadStruct(struct, reader);
-            } catch (Exception e) {
-                LOG.error(String.format("Load %s error", struct), e);
-            }
             }, service);
     }
 
