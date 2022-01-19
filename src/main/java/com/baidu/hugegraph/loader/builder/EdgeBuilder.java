@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.baidu.hugegraph.loader.exception.LoadException;
-import com.baidu.hugegraph.loader.exception.ParseException;
 import com.baidu.hugegraph.loader.executor.LoadContext;
 import com.baidu.hugegraph.loader.mapping.EdgeMapping;
 import com.baidu.hugegraph.loader.mapping.InputStruct;
@@ -188,23 +187,23 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
         index.sourceIndexes = new int[this.mapping.sourceFields().size()];
         //
         List<String> listNames = Arrays.asList(names);
-        for(int idx = 0; idx < this.mapping.sourceFields().size(); idx++) {
+        for (int idx = 0; idx < this.mapping.sourceFields().size(); idx++) {
             String field = this.mapping.sourceFields().get(idx);
             int i = listNames.indexOf(field);
-            if(i < 0) {
-                throw new LoadException("mapping file error: edges.source(%s) " +
-                                                "not in file header(%s)",
+            if (i < 0) {
+                throw new LoadException("mapping file error: edges.source(%s)" +
+                                                " not in file header(%s)",
                                         field, names);
             }
             index.sourceIndexes[idx] = i;
         }
 
-        for(int idx = 0; idx < this.mapping.targetFields().size(); idx++) {
+        for (int idx = 0; idx < this.mapping.targetFields().size(); idx++) {
             String field = this.mapping.targetFields().get(idx);
             int i = listNames.indexOf(field);
-            if(i < 0) {
-                throw new LoadException("mapping file error: edges.target(%s) " +
-                                                "not in file header(%s)",
+            if (i < 0) {
+                throw new LoadException("mapping file error: edges.target(%s)" +
+                                                " not in file header(%s)",
                                         field, names);
             }
             index.sourceIndexes[idx] = i;
