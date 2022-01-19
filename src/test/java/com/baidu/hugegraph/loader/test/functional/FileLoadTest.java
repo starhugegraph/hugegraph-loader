@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.baidu.hugegraph.loader.exception.ReadException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.common.type.Date;
@@ -1072,10 +1073,13 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
 
-        List<Vertex> vertices = CLIENT.graph().listVertices();
-        Assert.assertEquals(0, vertices.size());
+        Assert.assertThrows(ReadException.class, () -> {
+            HugeGraphLoader.main(args);
+        });
+
+        // List<Vertex> vertices = CLIENT.graph().listVertices();
+        // Assert.assertEquals(0, vertices.size());
         // Vertex vertex = vertices.get(0);
         // Assert.assertEquals(3, vertex.properties().size());
     }
@@ -1095,10 +1099,12 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        Assert.assertThrows(ReadException.class, () -> {
+            HugeGraphLoader.main(args);
+        });
 
-        List<Vertex> vertices = CLIENT.graph().listVertices();
-        Assert.assertEquals(0, vertices.size());
+        // List<Vertex> vertices = CLIENT.graph().listVertices();
+        // Assert.assertEquals(0, vertices.size());
     }
 
     @Test
