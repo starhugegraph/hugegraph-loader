@@ -200,6 +200,7 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
             index.sourceIndexes[idx] = i;
         }
 
+        index.targetIndexes = new int[this.mapping.targetFields().size()];
         for (int idx = 0; idx < this.mapping.targetFields().size(); idx++) {
             String field = this.mapping.targetFields().get(idx);
             int i = listNames.indexOf(field);
@@ -209,7 +210,7 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
                                         field, StringUtils.joinWith(",",
                                                                     names));
             }
-            index.sourceIndexes[idx] = i;
+            index.targetIndexes[idx] = i;
         }
         return index;
     }
