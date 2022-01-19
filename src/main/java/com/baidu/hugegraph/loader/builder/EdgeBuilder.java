@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.baidu.hugegraph.loader.exception.LoadException;
+import com.baidu.hugegraph.loader.exception.ParseException;
 import com.baidu.hugegraph.loader.executor.LoadContext;
 import com.baidu.hugegraph.loader.mapping.EdgeMapping;
 import com.baidu.hugegraph.loader.mapping.InputStruct;
@@ -184,25 +186,28 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
     private VertexIdsIndex extractVertexIdsIndex(String[] names) {
         VertexIdsIndex index = new VertexIdsIndex();
         index.sourceIndexes = new int[this.mapping.sourceFields().size()];
-        int idx = 0;
-        for (String field : this.mapping.sourceFields()) {
-            for (int pos = 0; pos < names.length; pos++) {
-                String name = names[pos];
-                if (field.equals(name)) {
-                    index.sourceIndexes[idx++] = pos;
-                }
+        //
+        List<String> listNames = Arrays.asList(names);
+        for(int idx = 0; idx < this.mapping.sourceFields().size(); idx++) {
+            String field = this.mapping.sourceFields().get(idx);
+            int i = listNames.indexOf(field);
+            if(i < 0) {
+                throw new LoadException("mapping file error: edges.source(%s) " +
+                                                "not in file header(%s)",
+                                        field, names);
             }
+            index.sourceIndexes[idx] = i;
         }
 
-        index.targetIndexes = new int[this.mapping.targetFields().size()];
-        idx = 0;
-        for (String field : this.mapping.targetFields()) {
-            for (int pos = 0; pos < names.length; pos++) {
-                String name = names[pos];
-                if (field.equals(name)) {
-                    index.targetIndexes[idx++] = pos;
-                }
+        for(int idx = 0; idx < this.mapping.targetFields().size(); idx++) {
+            String field = this.mapping.targetFields().get(idx);
+            int i = listNames.indexOf(field);
+            if(i < 0) {
+                throw new LoadException("mapping file error: edges.target(%s) " +
+                                                "not in file header(%s)",
+                                        field, names);
             }
+            index.sourceIndexes[idx] = i;
         }
         return index;
     }
