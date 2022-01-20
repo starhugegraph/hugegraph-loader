@@ -133,6 +133,7 @@ public final class HugeGraphLoader {
         } catch (Throwable t) {
             RuntimeException e = LoadUtil.targetRuntimeException(t);
             Printer.printError("Failed to load", e);
+            e.printStackTrace();
             if (this.context.options().testMode) {
                 throw e;
             }
@@ -327,7 +328,7 @@ public final class HugeGraphLoader {
     private CompletableFuture<Void> asyncLoadStruct(
             InputStruct struct, InputReader reader, ExecutorService service) {
         return CompletableFuture.runAsync(() -> {
-            this.loadStruct(struct, reader);
+                this.loadStruct(struct, reader);
             }, service);
     }
 

@@ -437,6 +437,8 @@ public abstract class ElementBuilder<GE extends GraphElement> {
 
         @Override
         public List<Vertex> buildVertices(boolean withProperty) {
+            E.checkArgument(this.idValues != null,
+                            "The flat id values shouldn't be null");
             List<Vertex> vertices = new ArrayList<>(this.idValues.size());
             for (Object idValue : this.idValues) {
                 Vertex vertex = new Vertex(vertexLabel.name());
