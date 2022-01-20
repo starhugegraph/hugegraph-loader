@@ -1074,7 +1074,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
 
-        Assert.assertThrows(ReadException.class, () -> {
+        Assert.assertThrows(Exception.class, () -> {
             HugeGraphLoader.main(args);
         });
 
@@ -1099,7 +1099,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        Assert.assertThrows(ReadException.class, () -> {
+        Assert.assertThrows(Exception.class, () -> {
             HugeGraphLoader.main(args);
         });
 
