@@ -23,10 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 
 import com.baidu.hugegraph.loader.exception.LoadException;
@@ -36,6 +38,7 @@ import com.baidu.hugegraph.loader.reader.Readable;
 import com.baidu.hugegraph.loader.source.InputSource;
 import com.baidu.hugegraph.loader.source.file.Compression;
 import com.baidu.hugegraph.loader.source.file.FileFilter;
+import com.baidu.hugegraph.loader.source.file.DirFilter;
 import com.baidu.hugegraph.loader.source.file.FileSource;
 import com.google.common.collect.ImmutableSet;
 
@@ -74,11 +77,54 @@ public class LocalFileReader extends FileReader {
                                         "path '%s'", file);
             }
             for (File subFile : subFiles) {
-                if (filter.reserved(subFile.getName())) {
-                    files.add(new LocalFile(subFile));
+                if (subFile.isFile() && this.isReservedFile(subFile)) {
+                    files.add(new LocalFile(subFile, file.getAbsolutePath()));
+                }
+                if (subFile.isDirectory()) {
+                    for (File dirSubFile : this.listDirWithFilter(subFile)) {
+                        if (this.isReservedFile(dirSubFile)) {
+                            files.add(new LocalFile(dirSubFile,
+                                                    file.getAbsolutePath()));
+                        }
+                    }
                 }
             }
         }
+        return files;
+    }
+
+    private boolean isReservedFile(File file) {
+        FileFilter filter = this.source().filter();
+        if (file.length() > 0 && filter.reserved(file.getName())) {
+            return true;
+        }
+        return false;
+    }
+
+    private List<File> listDirWithFilter(File dir) {
+        DirFilter dirFilter = this.source().dirFilter();
+        List<File> files  = new ArrayList<>();
+
+        if (dir.isFile()) {
+            files.add(dir);
+        }
+
+        if (dir.isDirectory() && dirFilter.reserved(dir.getName())) {
+            File[] subFiles = dir.listFiles();
+            if (subFiles == null) {
+                throw new LoadException("Error while listing the files of " +
+                        "dir path '%s'", dir);
+            }
+            for (File subFile : subFiles) {
+                if (subFile.isFile()) {
+                    files.add(subFile);
+                }
+                if (subFile.isDirectory()) {
+                    files.addAll(this.listDirWithFilter(subFile));
+                }
+            }
+        }
+
         return files;
     }
 
@@ -112,9 +158,14 @@ public class LocalFileReader extends FileReader {
     private static class LocalFile implements Readable {
 
         private final File file;
+        private final String inputPath;
 
         public LocalFile(File file) {
+            this(file, null);
+        }
+        public LocalFile(File file, String inputPath) {
             this.file = file;
+            this.inputPath = inputPath;
         }
 
         public File file() {
@@ -123,7 +174,17 @@ public class LocalFileReader extends FileReader {
 
         @Override
         public String name() {
-            return this.file.getName();
+            return this.relativeName();
+        }
+
+        private String relativeName() {
+            if (!StringUtils.isEmpty(this.inputPath)) {
+                return Paths.get(inputPath)
+                            .relativize(Paths.get(this.file.toURI()))
+                            .toString();
+            }
+
+            return file.getName();
         }
 
         @Override

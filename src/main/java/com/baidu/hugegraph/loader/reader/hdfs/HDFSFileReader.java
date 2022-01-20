@@ -21,9 +21,11 @@ package com.baidu.hugegraph.loader.reader.hdfs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.FileStatus;
@@ -45,6 +47,7 @@ import com.baidu.hugegraph.loader.reader.file.ParquetFileLineFetcher;
 import com.baidu.hugegraph.loader.source.InputSource;
 import com.baidu.hugegraph.loader.source.file.Compression;
 import com.baidu.hugegraph.loader.source.file.FileFilter;
+import com.baidu.hugegraph.loader.source.file.DirFilter;
 import com.baidu.hugegraph.loader.source.hdfs.HDFSSource;
 import com.baidu.hugegraph.loader.source.hdfs.KerberosConfig;
 import com.baidu.hugegraph.util.Log;
@@ -130,12 +133,59 @@ public class HDFSFileReader extends FileReader {
             FileStatus[] statuses = this.hdfs.listStatus(path);
             Path[] subPaths = FileUtil.stat2Paths(statuses);
             for (Path subPath : subPaths) {
-                if (filter.reserved(subPath.getName())) {
-                    paths.add(new HDFSFile(this.hdfs, subPath));
+                if (this.hdfs.isFile(subPath) && this.isReservedFile(subPath)) {
+                    paths.add(new HDFSFile(this.hdfs, subPath,
+                                           this.source().path()));
+                }
+                if (this.hdfs.isDirectory(subPath)) {
+                    for (Path dirSubPath : this.listDirWithFilter(subPath)) {
+                        if (this.isReservedFile(dirSubPath)) {
+                            paths.add(new HDFSFile(this.hdfs, dirSubPath,
+                                                   this.source().path()));
+                        }
+                    }
                 }
             }
         }
         return paths;
+    }
+
+    private boolean isReservedFile(Path path) throws IOException {
+        FileStatus status = this.hdfs.getFileStatus(path);
+        FileFilter filter = this.source().filter();
+
+        if (status.getLen() > 0 && filter.reserved(path.getName())) {
+            return true;
+        }
+        return false;
+    }
+
+    private List<Path> listDirWithFilter(Path dir) throws IOException {
+        DirFilter dirFilter = this.source().dirFilter();
+        List<Path> files  = new ArrayList<>();
+
+        if (this.hdfs.isFile(dir)) {
+            files.add(dir);
+        }
+
+        if (this.hdfs.isDirectory(dir) && dirFilter.reserved(dir.getName())) {
+            FileStatus[] statuses = this.hdfs.listStatus(dir);
+            Path[] subPaths = FileUtil.stat2Paths(statuses);
+            if (subPaths == null) {
+                throw new LoadException("Error while listing the files of " +
+                                        "dir path '%s'", dir);
+            }
+            for (Path subFile : subPaths) {
+                if (this.hdfs.isFile(subFile)) {
+                    files.add(subFile);
+                }
+                if (this.hdfs.isDirectory(subFile)) {
+                    files.addAll(this.listDirWithFilter(subFile));
+                }
+            }
+        }
+
+        return files;
     }
 
     @Override
@@ -174,10 +224,16 @@ public class HDFSFileReader extends FileReader {
 
         private final FileSystem hdfs;
         private final Path path;
+        private final String inputPath;
 
         private HDFSFile(FileSystem hdfs, Path path) {
+            this(hdfs, path, null);
+        }
+
+        private HDFSFile(FileSystem hdfs, Path path, String inputpath) {
             this.hdfs = hdfs;
             this.path = path;
+            this.inputPath = inputpath;
         }
 
         public FileSystem hdfs() {
@@ -186,6 +242,17 @@ public class HDFSFileReader extends FileReader {
 
         @Override
         public String name() {
+            return this.relativeName();
+        }
+
+        private String relativeName() {
+            if (!StringUtils.isEmpty(inputPath) &&
+                Paths.get(inputPath).isAbsolute()) {
+                String strPath = this.path.toUri().getPath();
+                return Paths.get(inputPath)
+                            .relativize(Paths.get(strPath)).toString();
+            }
+
             return this.path.getName();
         }
 

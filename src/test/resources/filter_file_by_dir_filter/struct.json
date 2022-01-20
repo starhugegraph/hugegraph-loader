@@ -1,0 +1,25 @@
+{
+  "vertices": [
+    {
+      "label": "person",
+      "input": {
+        "type": "${source_type}",
+        "path": "${store_path}",
+        "file_filter": {
+          "extensions": ["csv"]
+        },
+        "dir_filter": {
+          "include_regex": "^level.*",
+          "exclude_regex": "^level2.*"
+        },
+        "format": "CSV",
+        "charset": "UTF-8"
+      },
+      "field_mapping": {
+        "name": "name",
+        "age": "age",
+        "city": "city"
+      }
+    }
+  ]
+}

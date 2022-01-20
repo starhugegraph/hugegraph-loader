@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.baidu.hugegraph.loader.exception.ReadException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.common.type.Date;
@@ -1072,12 +1073,15 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
 
-        List<Vertex> vertices = CLIENT.graph().listVertices();
-        Assert.assertEquals(1, vertices.size());
-        Vertex vertex = vertices.get(0);
-        Assert.assertEquals(3, vertex.properties().size());
+        Assert.assertThrows(Exception.class, () -> {
+            HugeGraphLoader.main(args);
+        });
+
+        // List<Vertex> vertices = CLIENT.graph().listVertices();
+        // Assert.assertEquals(0, vertices.size());
+        // Vertex vertex = vertices.get(0);
+        // Assert.assertEquals(3, vertex.properties().size());
     }
 
     @Test
@@ -1095,10 +1099,12 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        Assert.assertThrows(Exception.class, () -> {
+            HugeGraphLoader.main(args);
+        });
 
-        List<Vertex> vertices = CLIENT.graph().listVertices();
-        Assert.assertEquals(3, vertices.size());
+        // List<Vertex> vertices = CLIENT.graph().listVertices();
+        // Assert.assertEquals(0, vertices.size());
     }
 
     @Test
@@ -1585,6 +1591,100 @@ public class FileLoadTest extends LoadTest {
                        "age", 29, "city", "Beijing");
         assertContains(vertices, "person", "name", "vadas",
                        "age", 27, "city", "Beijing");
+    }
+
+    @Test
+    public void testFilterFileByDirFilter() {
+        ioUtil.mkdirs("nolevel1_dir1");
+        ioUtil.mkdirs("level1_dir1");
+        ioUtil.mkdirs("level1_dir1/level2_dir1");
+        ioUtil.mkdirs("level1_dir2");
+        ioUtil.mkdirs("level1_dir2/level2_dir2");
+        ioUtil.mkdirs("level1_dir2/level2_dir2/level3_dir1");
+        ioUtil.write("nolevel1_dir1/vertex_person.csv",
+                "name,age,city",
+                "nolevel1_dir1_marko,29,Beijing",
+                "nolevel1_dir1_vadas,27,Hongkong");
+        ioUtil.write("level1_dir1/vertex_person.csv",
+                "name,age,city",
+                "level1_dir1_marko,29,Beijing",
+                "level1_dir1_vadas,27,Hongkong");
+        ioUtil.write("level1_dir1/level2_dir1/vertex_person.csv",
+                "name,age,city",
+                "level2_dir1_marko,29,Beijing",
+                "level2_dir1_vadas,27,Hongkong");
+        ioUtil.write("level1_dir2/vertex_person.csv",
+                "name,age,city",
+                "level1_dir2_marko,29,Beijing",
+                "level1_dir2_vadas,27,Hongkong");
+        ioUtil.write("level1_dir2/level2_dir2/vertex_person.csv",
+                "name,age,city",
+                "level2_dir2_marko,29,Beijing",
+                "level2_dir2_vadas,27,Hongkong");
+        ioUtil.write("level1_dir2/level2_dir2/level3_dir1/vertex_person.csv",
+                "name,age,city",
+                "level3_dir1_marko,29,Beijing",
+                "level3_dir1_vadas,27,Hongkong");
+
+        String[] args = new String[]{
+                "-f", structPath("filter_file_by_dir_filter/struct.json"),
+                "-s", configPath("filter_file_by_dir_filter/schema.groovy"),
+                "-g", GRAPH,
+                "-h", SERVER,
+                "--test-mode", "true"
+        };
+
+        HugeGraphLoader.main(args);
+
+        List<Vertex> vertices = CLIENT.graph().listVertices();
+        Assert.assertEquals(4, vertices.size());
+    }
+
+    @Test
+    public void testFilterFileByDirFilterNoConfig() {
+        ioUtil.mkdirs("nolevel1_dir1");
+        ioUtil.mkdirs("level1_dir1");
+        ioUtil.mkdirs("level1_dir1/level2_dir1");
+        ioUtil.mkdirs("level1_dir2");
+        ioUtil.mkdirs("level1_dir2/level2_dir2");
+        ioUtil.mkdirs("level1_dir2/level2_dir2/level3_dir1");
+        ioUtil.write("nolevel1_dir1/vertex_person.csv",
+                "name,age,city",
+                "nolevel1_dir1_marko,29,Beijing",
+                "nolevel1_dir1_vadas,27,Hongkong");
+        ioUtil.write("level1_dir1/vertex_person.csv",
+                "name,age,city",
+                "level1_dir1_marko,29,Beijing",
+                "level1_dir1_vadas,27,Hongkong");
+        ioUtil.write("level1_dir1/level2_dir1/vertex_person.csv",
+                "name,age,city",
+                "level2_dir1_marko,29,Beijing",
+                "level2_dir1_vadas,27,Hongkong");
+        ioUtil.write("level1_dir2/vertex_person.csv",
+                "name,age,city",
+                "level1_dir2_marko,29,Beijing",
+                "level1_dir2_vadas,27,Hongkong");
+        ioUtil.write("level1_dir2/level2_dir2/vertex_person.csv",
+                "name,age,city",
+                "level2_dir2_marko,29,Beijing",
+                "level2_dir2_vadas,27,Hongkong");
+        ioUtil.write("level1_dir2/level2_dir2/level3_dir1/vertex_person.csv",
+                "name,age,city",
+                "level3_dir1_marko,29,Beijing",
+                "level3_dir1_vadas,27,Hongkong");
+
+        String[] args = new String[]{
+                "-f", structPath("filter_file_by_dir_filter_no_config/struct.json"),
+                "-s", configPath("filter_file_by_dir_filter_no_config/schema.groovy"),
+                "-g", GRAPH,
+                "-h", SERVER,
+                "--test-mode", "true"
+        };
+
+        HugeGraphLoader.main(args);
+
+        List<Vertex> vertices = CLIENT.graph().listVertices();
+        Assert.assertEquals(12, vertices.size());
     }
 
     @Test

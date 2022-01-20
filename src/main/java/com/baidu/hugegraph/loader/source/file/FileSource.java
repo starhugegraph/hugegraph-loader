@@ -33,6 +33,8 @@ public class FileSource extends AbstractSource {
 
     @JsonProperty("path")
     private String path;
+    @JsonProperty("dir_filter")
+    private DirFilter dirFilter;
     @JsonProperty("file_filter")
     private FileFilter filter;
     @JsonProperty("format")
@@ -51,13 +53,14 @@ public class FileSource extends AbstractSource {
     private int batchSize;
 
     public FileSource() {
-        this(null, new FileFilter(), FileFormat.CSV, Constants.COMMA_STR,
-             Constants.DATE_FORMAT, Constants.TIME_ZONE, new SkippedLine(),
-             Compression.NONE, 500);
+        this(null, new DirFilter(), new FileFilter(), FileFormat.CSV,
+             Constants.COMMA_STR, Constants.DATE_FORMAT, Constants.TIME_ZONE,
+             new SkippedLine(), Compression.NONE, 500);
     }
 
     @JsonCreator
     public FileSource(@JsonProperty("path") String path,
+                      @JsonProperty("dir_filter") DirFilter dirFilter,
                       @JsonProperty("filter") FileFilter filter,
                       @JsonProperty("format") FileFormat format,
                       @JsonProperty("delimiter") String delimiter,
@@ -67,6 +70,7 @@ public class FileSource extends AbstractSource {
                       @JsonProperty("compression") Compression compression,
                       @JsonProperty("batch_size") Integer batchSize) {
         this.path = path;
+        this.dirFilter = dirFilter != null ? dirFilter : new DirFilter();
         this.filter = filter != null ? filter : new FileFilter();
         this.format = format != null ? format : FileFormat.CSV;
         this.delimiter = delimiter != null ?
@@ -112,6 +116,14 @@ public class FileSource extends AbstractSource {
 
     public void path(String path) {
         this.path = path;
+    }
+
+    public DirFilter dirFilter() {
+        return this.dirFilter;
+    }
+
+    public void setDirFilter(DirFilter dirFilter) {
+        this.dirFilter = dirFilter;
     }
 
     public FileFilter filter() {
@@ -185,6 +197,7 @@ public class FileSource extends AbstractSource {
         source.charset(this.charset());
         source.listFormat(this.listFormat());
         source.path = this.path;
+        source.dirFilter = this.dirFilter;
         source.filter = this.filter;
         source.format = this.format;
         source.delimiter = this.delimiter;
