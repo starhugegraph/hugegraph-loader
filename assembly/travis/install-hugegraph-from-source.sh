@@ -20,4 +20,6 @@ rm -rf hugegraph
 tar -zxvf hugegraph-*.tar.gz
 
 cd hugegraph-*/
+chmod +x install-hstore-dependency.sh
+./install-hstore-dependency.sh
 bin/start-hugegraph.sh
