@@ -37,6 +37,7 @@ import com.baidu.hugegraph.structure.schema.SchemaLabel;
 import com.baidu.hugegraph.structure.schema.VertexLabel;
 import com.baidu.hugegraph.util.E;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 
 public class EdgeBuilder extends ElementBuilder<Edge> {
 
@@ -184,25 +185,27 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
     private VertexIdsIndex extractVertexIdsIndex(String[] names) {
         VertexIdsIndex index = new VertexIdsIndex();
         index.sourceIndexes = new int[this.mapping.sourceFields().size()];
-        int idx = 0;
-        for (String field : this.mapping.sourceFields()) {
-            for (int pos = 0; pos < names.length; pos++) {
-                String name = names[pos];
-                if (field.equals(name)) {
-                    index.sourceIndexes[idx++] = pos;
-                }
-            }
+        //
+        List<String> listNames = Arrays.asList(names);
+        for (int idx = 0; idx < this.mapping.sourceFields().size(); idx++) {
+            String field = this.mapping.sourceFields().get(idx);
+            int i = listNames.indexOf(field);
+            E.checkArgument(i >= 0,
+                            "mapping file error: edges.source(%s)" +
+                                    " not in file header([%s])", field,
+                            StringUtils.joinWith(",", names));
+            index.sourceIndexes[idx] = i;
         }
 
         index.targetIndexes = new int[this.mapping.targetFields().size()];
-        idx = 0;
-        for (String field : this.mapping.targetFields()) {
-            for (int pos = 0; pos < names.length; pos++) {
-                String name = names[pos];
-                if (field.equals(name)) {
-                    index.targetIndexes[idx++] = pos;
-                }
-            }
+        for (int idx = 0; idx < this.mapping.targetFields().size(); idx++) {
+            String field = this.mapping.targetFields().get(idx);
+            int i = listNames.indexOf(field);
+            E.checkArgument(i >= 0,
+                            "mapping file error: edges.target(%s)" +
+                                    " not in file header([%s])", field,
+                            StringUtils.joinWith(",", names));
+            index.targetIndexes[idx] = i;
         }
         return index;
     }

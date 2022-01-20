@@ -42,6 +42,14 @@ public class TextLineParser implements LineParser {
     @Override
     public Line parse(String[] header, String rawLine) throws ReadException {
         String[] columns = this.split(rawLine);
+        // 2022-01-19, throw Exception when columns.length != header.length
+        if (columns.length != header.length) {
+            throw new ReadException(rawLine,
+                                    "The column length '%s' doesn't match" +
+                                            " with header length '%s' on: %s",
+                                    columns.length, header.length, rawLine);
+        }
+
         if (columns.length > header.length) {
             // Ignore extra empty string at the tail of line
             int extra = columns.length - header.length;
