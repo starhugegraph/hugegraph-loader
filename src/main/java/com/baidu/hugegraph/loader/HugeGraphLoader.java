@@ -136,10 +136,9 @@ public final class HugeGraphLoader {
         int requestTimeout = options.timeout;
         options.timeout = options.clearTimeout;
         HugeClient client = HugeClientHolder.create(options);
-        String message = "I'm sure to delete all data";
 
         LOG.info("Prepare to clear the data of graph '{}'", options.graph);
-        client.graphs().clear(options.graph, message);
+        client.graphs().clear(options.graph);
         LOG.info("The graph '{}' has been cleared successfully", options.graph);
         options.timeout = requestTimeout;
         client.close();
