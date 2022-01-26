@@ -13,6 +13,7 @@ HUGEGRAPH_GIT_URL="https://github.com/starhugegraph/hugegraph.git"
 git clone ${HUGEGRAPH_GIT_URL}
 cd hugegraph
 git checkout -b gh-pre-release origin/gh-pre-release
+cat pom.xml
 mvn package -DskipTests
 mv hugegraph-*.tar.gz ../
 cd ../
