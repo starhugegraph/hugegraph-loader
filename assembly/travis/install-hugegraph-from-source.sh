@@ -18,7 +18,7 @@ chmod +x install-hstore-dependency.sh
 ./install-hstore-dependency.sh
 
 # copy local graph config file
-TRAVIS_DIR=./hugegraph-dist/src/assembly/travis/lib
+TRAVIS_DIR=./hugegraph-dist/src/assembly/travis
 cp $TRAVIS_DIR/graphs/hugegraph.properties ../
 
 mvn package -DskipTests
