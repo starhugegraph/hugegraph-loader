@@ -156,7 +156,7 @@ public class LoadTest {
         Assert.assertEquals(expectTimeStamp, actualTimeStamp);
     }
 
-    public static void testmain(String[] args) {
+    public static void authmain(String[] args) {
             ArrayList list = new ArrayList(Arrays.asList(args));
             list.add("--username");
             list.add("admin");

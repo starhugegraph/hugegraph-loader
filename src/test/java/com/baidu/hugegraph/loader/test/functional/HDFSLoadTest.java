@@ -67,7 +67,7 @@ public class HDFSLoadTest extends FileLoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        testmain(args);
+        authmain(args);
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(5, vertices.size());
     }
@@ -91,7 +91,7 @@ public class HDFSLoadTest extends FileLoadTest {
                 "--test-mode", "true"
         };
         Assert.assertThrows(LoadException.class, () -> {
-            testmain(args);
+            authmain(args);
         });
     }
 
@@ -114,7 +114,7 @@ public class HDFSLoadTest extends FileLoadTest {
                 "--test-mode", "true"
         };
         Assert.assertThrows(LoadException.class, () -> {
-            testmain(args);
+            authmain(args);
         }, e -> {
             String message = "An exception occurred while checking HDFS path";
             Assert.assertTrue(e.getMessage().contains(message));
@@ -140,7 +140,7 @@ public class HDFSLoadTest extends FileLoadTest {
                 "--test-mode", "true"
         };
         Assert.assertThrows(LoadException.class, () -> {
-            testmain(args);
+            authmain(args);
         }, e -> {
             Throwable t = e.getCause();
             Assert.assertEquals(IllegalArgumentException.class, t.getClass());
