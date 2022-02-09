@@ -102,6 +102,10 @@ public final class LoadOptions {
             description = "The username of graph for authentication")
     public String username = null;
 
+    @Parameter(names = {"--password"}, arity = 1,
+            description = "The password of graph for authentication")
+    public String password = null;
+
     @Parameter(names = {"--protocol"}, arity = 1,
             validateWith = {ProtocolValidator.class},
             description = "The protocol of HugeGraphServer, " +

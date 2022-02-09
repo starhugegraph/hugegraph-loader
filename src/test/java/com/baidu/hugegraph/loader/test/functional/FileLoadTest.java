@@ -104,7 +104,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2"
         };
 
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<PropertyKey> propertyKeys = CLIENT.schema().getPropertyKeys();
         propertyKeys.forEach(pkey -> {
@@ -174,7 +174,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -221,7 +221,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(LoadException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
     }
 
@@ -231,6 +231,8 @@ public class FileLoadTest extends LoadTest {
         options.host = Constants.HTTP_PREFIX + SERVER;
         options.port = PORT;
         options.graph = GRAPH;
+        options.username = USERNAME;
+        options.password = PASSWORD;
         HugeClient client = HugeClientHolder.create(options);
         SchemaManager schema = client.schema();
         schema.propertyKey("name").asText().ifNotExist().create();
@@ -252,11 +254,11 @@ public class FileLoadTest extends LoadTest {
                 "-f", structPath("clear_schema_before_load/struct.json"),
                 "-g", GRAPH,
                 "-h", SERVER,
-                "--batch-insert-threads", "2",
+                "--batch-insert-threads", "1",
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args1);
+            authmain(args1);
         }, (e) -> {
             String msg = e.getMessage();
             Assert.assertTrue(msg.startsWith("Failed to convert value"));
@@ -272,7 +274,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args2);
+        authmain(args2);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(5, vertices.size());
@@ -311,7 +313,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -343,7 +345,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -372,7 +374,7 @@ public class FileLoadTest extends LoadTest {
         };
         // Bytes encoded in utf-8 exceed 128
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
     }
 
@@ -394,7 +396,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(5, vertices.size());
@@ -418,8 +420,8 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true",
                 "--clear-all-data","true"
         };
-        AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+        AsyncThrowsAssert.assertThrows(ServerException.class, () -> {
+            authmain(args);
         });
     }
 
@@ -438,7 +440,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -459,7 +461,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -484,7 +486,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -508,7 +510,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -532,7 +534,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(0, vertices.size());
@@ -553,7 +555,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         }, (e) -> {
             Assert.assertTrue(e.getMessage().contains("Parse line '' error"));
         });
@@ -583,7 +585,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Edge> edges = CLIENT.graph().listEdges();
         Assert.assertEquals(1, edges.size());
@@ -611,7 +613,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Edge> edges = CLIENT.graph().listEdges();
         Assert.assertEquals(1, edges.size());
@@ -644,7 +646,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Edge> edges = CLIENT.graph().listEdges();
         Assert.assertEquals(1, edges.size());
@@ -677,7 +679,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -706,7 +708,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -733,7 +735,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         // Invalid mapping file
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(0, vertices.size());
@@ -759,7 +761,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Edge> edges = CLIENT.graph().listEdges();
         Assert.assertEquals(1, edges.size());
@@ -793,7 +795,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(4, vertices.size());
@@ -821,7 +823,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(8, vertices.size());
@@ -844,7 +846,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -866,7 +868,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -888,7 +890,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -909,7 +911,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -935,7 +937,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(3, vertices.size());
@@ -956,7 +958,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(3, vertices.size());
@@ -975,7 +977,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
 
@@ -1003,7 +1005,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1028,7 +1030,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1053,7 +1055,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(0, vertices.size());
@@ -1075,7 +1077,7 @@ public class FileLoadTest extends LoadTest {
         };
 
         Assert.assertThrows(Exception.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         // List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -1100,7 +1102,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         Assert.assertThrows(Exception.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         // List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -1122,7 +1124,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(3, vertices.size());
@@ -1148,7 +1150,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(3, vertices.size());
@@ -1180,7 +1182,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         Assert.assertThrows(LoadException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
     }
 
@@ -1200,7 +1202,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1221,7 +1223,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1244,7 +1246,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1260,7 +1262,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(0, vertices.size());
@@ -1277,7 +1279,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(0, vertices.size());
@@ -1296,7 +1298,7 @@ public class FileLoadTest extends LoadTest {
         };
 
         Assert.assertThrows(LoadException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
     }
 
@@ -1310,6 +1312,8 @@ public class FileLoadTest extends LoadTest {
                 "-s", configPath("header_is_empty/schema.groovy"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--test-mode", "true"
         };
         Assert.assertThrows(LoadException.class, () -> {
@@ -1335,7 +1339,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(5, vertices.size());
@@ -1355,7 +1359,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1376,7 +1380,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -1399,7 +1403,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1424,7 +1428,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1449,7 +1453,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1481,7 +1485,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1520,7 +1524,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1554,7 +1558,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -1583,7 +1587,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1634,7 +1638,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
 
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(4, vertices.size());
@@ -1681,7 +1685,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
 
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(12, vertices.size());
@@ -1703,7 +1707,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         Assert.assertThrows(LoadException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
     }
 
@@ -1725,7 +1729,7 @@ public class FileLoadTest extends LoadTest {
                 "-h", SERVER,
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(2, vertices.size());
@@ -1745,7 +1749,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1765,7 +1769,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1785,7 +1789,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1805,7 +1809,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1825,7 +1829,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1845,7 +1849,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1868,7 +1872,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1888,7 +1892,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1908,7 +1912,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1928,7 +1932,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -1951,7 +1955,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--max-parse-errors", "3"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
     }
 
     @Test
@@ -1971,7 +1975,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--check-vertex", "false"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -2010,7 +2014,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--check-vertex", "false"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -2051,7 +2055,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         });
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
@@ -2078,7 +2082,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--check-vertex", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Edge> edges = CLIENT.graph().listEdges();
 
@@ -2103,7 +2107,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(0, vertices.size());
@@ -2133,6 +2137,8 @@ public class FileLoadTest extends LoadTest {
                 configPath("incremental_mode_and_load_failure/schema.groovy"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--batch-insert-threads", "2",
                 "--max-parse-errors", "1",
                 "--test-mode", "false"
@@ -2184,6 +2190,8 @@ public class FileLoadTest extends LoadTest {
                 structPath("incremental_mode_and_load_failure/struct.json"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--incremental-mode", "true",
                 "--failure-mode", "false",
                 "--batch-insert-threads", "2",
@@ -2261,6 +2269,8 @@ public class FileLoadTest extends LoadTest {
                 structPath("incremental_mode_and_load_failure/struct.json"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--incremental-mode", "false",
                 "--failure-mode", "true",
                 "--batch-insert-threads", "2",
@@ -2324,6 +2334,8 @@ public class FileLoadTest extends LoadTest {
                 "-s", configPath("reload_json_failure_files/schema.groovy"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--check-vertex", "true",
                 "--batch-insert-threads", "2",
                 "--test-mode", "false"
@@ -2365,7 +2377,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "false"
         };
         // No exception throw, but error line still exist
-        HugeGraphLoader.main(args);
+        authmain(args);
         Thread.sleep(1000);
 
         // Reload with modification
@@ -2394,7 +2406,7 @@ public class FileLoadTest extends LoadTest {
         FileUtils.writeLines(knowsFailureFile, failureLines, false);
 
         // No exception throw, and error line doesn't exist
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         edges = CLIENT.graph().listEdges();
         Assert.assertEquals(2, edges.size());
@@ -2427,7 +2439,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -2479,7 +2491,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(1, vertices.size());
@@ -2519,7 +2531,7 @@ public class FileLoadTest extends LoadTest {
                           "parquet_compress_file/vertex_person.parquet"),
                           "hdfs://localhost:8020/files/vertex_person.parquet");
         }
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(5, vertices.size());
@@ -2546,7 +2558,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -2587,7 +2599,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         }, e -> {
             String msgSuffix = "check whether the headers or field_mapping " +
                                "are configured correctly";
@@ -2627,7 +2639,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         }, e -> {
             String msgSuffix = "check whether the headers or field_mapping " +
                                "are configured correctly";
@@ -2658,7 +2670,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(3, vertices.size());
@@ -2692,7 +2704,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -2719,7 +2731,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(3, vertices.size());
@@ -2742,7 +2754,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Edge> edges = CLIENT.graph().listEdges();
         Assert.assertEquals(1, edges.size());
@@ -2765,7 +2777,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(6, vertices.size());
@@ -2789,7 +2801,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(10, vertices.size());
@@ -2822,7 +2834,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(10, vertices.size());
@@ -2853,7 +2865,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(10, vertices.size());
@@ -2886,7 +2898,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(10, vertices.size());
@@ -2919,7 +2931,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         }, e -> {
             String msg = "In case unfold is true, just supported " +
                          "a single primary key";
@@ -2951,7 +2963,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
     }
 
     @Test
@@ -2975,7 +2987,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -3007,7 +3019,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -3038,7 +3050,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         List<Edge> edges = CLIENT.graph().listEdges();
@@ -3070,7 +3082,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args);
+            authmain(args);
         }, e -> {
             String msg = "The elements number of source and target must be: " +
                          "1 to n, n to 1, n to n";
@@ -3107,7 +3119,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(4, vertices.size());
@@ -3121,7 +3133,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(6, vertices.size());
@@ -3144,18 +3156,10 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
-        HugeClient httpsClient = null;
-        try {
-            httpsClient = HugeClient.builder(HTTPS_URL, GRAPHSPACE, GRAPH)
-                                    .configSSL(TRUST_STORE_FILE, "hugegraph")
-                                    .build();
-            List<Vertex> vertices = httpsClient.graph().listVertices();
-            Assert.assertEquals(2, vertices.size());
-        } finally {
-            clearAndClose(httpsClient, GRAPH);
-        }
+        List<Vertex> vertices = CLIENT.graph().listVertices();
+        Assert.assertEquals(2, vertices.size());
     }
 
 //    @Test
@@ -3175,7 +3179,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args);
+        authmain(args);
 
         LoadOptions options = new LoadOptions();
         options.host = SERVER;
@@ -3185,13 +3189,7 @@ public class FileLoadTest extends LoadTest {
         options.trustStoreFile = TRUST_STORE_FILE;
         options.trustStoreToken = "hugegraph";
 
-        HugeClient httpsClient = null;
-        try {
-            httpsClient = HugeClientHolder.create(options);
-            List<Vertex> vertices = httpsClient.graph().listVertices();
-            Assert.assertEquals(2, vertices.size());
-        } finally {
-            clearAndClose(httpsClient, GRAPH);
-        }
+        List<Vertex> vertices = CLIENT.graph().listVertices();
+        Assert.assertEquals(2, vertices.size());
     }
 }

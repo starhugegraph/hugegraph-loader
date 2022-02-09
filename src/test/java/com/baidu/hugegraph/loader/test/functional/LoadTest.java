@@ -22,12 +22,16 @@ package com.baidu.hugegraph.loader.test.functional;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
 import com.baidu.hugegraph.driver.HugeClient;
+import com.baidu.hugegraph.loader.HugeGraphLoader;
+import com.baidu.hugegraph.loader.util.Printer;
 import com.baidu.hugegraph.structure.constant.T;
 import com.baidu.hugegraph.structure.graph.Edge;
 import com.baidu.hugegraph.structure.graph.Vertex;
@@ -39,6 +43,8 @@ public class LoadTest {
     protected static final String GRAPHSPACE = "DEFAULT";
     protected static final String GRAPH = "hugegraph";
     protected static final String SERVER = "127.0.0.1";
+    protected static final String USERNAME = "admin";
+    protected static final String PASSWORD = "admin";
     protected static final int PORT = 8080;
     protected static final int HTTPS_PORT = 8443;
     protected static final String CONFIRM_CLEAR = "I'm sure to delete all data";
@@ -49,10 +55,10 @@ public class LoadTest {
     protected static final String HTTPS_PROTOCOL = "https";
     protected static final String TRUST_STORE_FILE =
                                   "assembly/travis/conf/hugegraph.truststore";
-    protected static final HugeClient CLIENT = HugeClient.builder(URL,
-                                                                  GRAPHSPACE,
-                                                                  GRAPH)
-                                                         .build();
+    protected static final HugeClient CLIENT =
+            HugeClient.builder(URL, GRAPHSPACE, GRAPH)
+                      .configUser(USERNAME, PASSWORD)
+                      .build();
 
     public static String configPath(String fileName) {
         return Paths.get(CONFIG_PATH_PREFIX, fileName).toString();
@@ -148,5 +154,16 @@ public class LoadTest {
         long actualTimeStamp = actualDF.parse(actualDate).getTime();
 
         Assert.assertEquals(expectTimeStamp, actualTimeStamp);
+    }
+
+    public static void authmain(String[] args) {
+            ArrayList list = new ArrayList(Arrays.asList(args));
+            list.add("--username");
+            list.add("admin");
+            list.add("--password");
+            list.add("admin");
+            args = (String[]) list.toArray(new String[list.size()]);
+
+            HugeGraphLoader.main(args);
     }
 }

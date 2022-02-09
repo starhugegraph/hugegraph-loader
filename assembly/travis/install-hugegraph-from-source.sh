@@ -13,6 +13,14 @@ HUGEGRAPH_GIT_URL="https://github.com/starhugegraph/hugegraph.git"
 git clone ${HUGEGRAPH_GIT_URL}
 cd hugegraph
 git checkout -b gh-dis-release origin/gh-dis-release
+
+chmod +x install-hstore-dependency.sh
+./install-hstore-dependency.sh
+
+# copy local graph config file
+TRAVIS_DIR=./hugegraph-dist/src/assembly/travis
+cp $TRAVIS_DIR/graphs/hugegraph.properties ../
+
 mvn package -DskipTests
 mv hugegraph-*.tar.gz ../
 cd ../
@@ -20,6 +28,10 @@ rm -rf hugegraph
 tar -zxvf hugegraph-*.tar.gz
 
 cd hugegraph-*/
-chmod +x install-hstore-dependency.sh
-./install-hstore-dependency.sh
+
+# create local graph
+cp ../hugegraph.properties conf/graphs/
+bin/init-store.sh
+
+# start
 bin/start-hugegraph.sh
