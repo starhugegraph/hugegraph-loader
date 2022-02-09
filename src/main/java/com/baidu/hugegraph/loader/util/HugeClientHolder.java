@@ -58,8 +58,9 @@ public final class HugeClientHolder {
         try {
             builder = HugeClient.builder(address, options.graphSpace,
                                          options.graph)
-                                .configUser(username, options.token)
                                 .configTimeout(options.timeout)
+                                .configToken(options.token)
+                                .configUser(username, options.password)
                                 .configPool(options.maxConnections,
                                             options.maxConnectionsPerRoute);
             if (useHttps) {
@@ -141,12 +142,13 @@ public final class HugeClientHolder {
         }
 
         try {
-            HugeClient client
-                    = clientFactory.createAuthClient(options.cluster,
-                                                     options.graphSpace,
-                                                     options.graph, null,
-                                                     options.username,
-                                                     options.token);
+            HugeClient client =
+                    clientFactory.createAuthClient(options.cluster,
+                                                   options.graphSpace,
+                                                   options.graph,
+                                                   options.token,
+                                                   options.username,
+                                                   options.password);
             return client;
         } catch (IllegalStateException e) {
             String message = e.getMessage();
