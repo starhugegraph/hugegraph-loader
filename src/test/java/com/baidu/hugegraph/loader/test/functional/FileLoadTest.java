@@ -1310,6 +1310,8 @@ public class FileLoadTest extends LoadTest {
                 "-s", configPath("header_is_empty/schema.groovy"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--test-mode", "true"
         };
         Assert.assertThrows(LoadException.class, () -> {
@@ -2133,6 +2135,8 @@ public class FileLoadTest extends LoadTest {
                 configPath("incremental_mode_and_load_failure/schema.groovy"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--batch-insert-threads", "2",
                 "--max-parse-errors", "1",
                 "--test-mode", "false"
@@ -2184,6 +2188,8 @@ public class FileLoadTest extends LoadTest {
                 structPath("incremental_mode_and_load_failure/struct.json"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--incremental-mode", "true",
                 "--failure-mode", "false",
                 "--batch-insert-threads", "2",
@@ -2261,6 +2267,8 @@ public class FileLoadTest extends LoadTest {
                 structPath("incremental_mode_and_load_failure/struct.json"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--incremental-mode", "false",
                 "--failure-mode", "true",
                 "--batch-insert-threads", "2",
@@ -2324,6 +2332,8 @@ public class FileLoadTest extends LoadTest {
                 "-s", configPath("reload_json_failure_files/schema.groovy"),
                 "-g", GRAPH,
                 "-h", SERVER,
+                "--username", USERNAME,
+                "--password", PASSWORD,
                 "--check-vertex", "true",
                 "--batch-insert-threads", "2",
                 "--test-mode", "false"
