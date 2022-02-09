@@ -43,6 +43,8 @@ public class LoadTest {
     protected static final String GRAPHSPACE = "DEFAULT";
     protected static final String GRAPH = "hugegraph";
     protected static final String SERVER = "127.0.0.1";
+    protected static final String USERNAME = "admin";
+    protected static final String PASSWORD = "admin";
     protected static final int PORT = 8080;
     protected static final int HTTPS_PORT = 8443;
     protected static final String CONFIRM_CLEAR = "I'm sure to delete all data";
@@ -53,10 +55,10 @@ public class LoadTest {
     protected static final String HTTPS_PROTOCOL = "https";
     protected static final String TRUST_STORE_FILE =
                                   "assembly/travis/conf/hugegraph.truststore";
-    protected static final HugeClient CLIENT = HugeClient.builder(URL,
-                                                                  GRAPHSPACE,
-                                                                  GRAPH)
-                                                         .build();
+    protected static final HugeClient CLIENT =
+            HugeClient.builder(URL, GRAPHSPACE, GRAPH)
+                      .configUser(USERNAME, PASSWORD)
+                      .build();
 
     public static String configPath(String fileName) {
         return Paths.get(CONFIG_PATH_PREFIX, fileName).toString();

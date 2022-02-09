@@ -3146,16 +3146,8 @@ public class FileLoadTest extends LoadTest {
         };
         testmain(args);
 
-        HugeClient httpsClient = null;
-        try {
-            httpsClient = HugeClient.builder(HTTPS_URL, GRAPHSPACE, GRAPH)
-                                    .configSSL(TRUST_STORE_FILE, "hugegraph")
-                                    .build();
-            List<Vertex> vertices = httpsClient.graph().listVertices();
-            Assert.assertEquals(2, vertices.size());
-        } finally {
-            clearAndClose(httpsClient, GRAPH);
-        }
+        List<Vertex> vertices = CLIENT.graph().listVertices();
+        Assert.assertEquals(2, vertices.size());
     }
 
 //    @Test
@@ -3185,13 +3177,7 @@ public class FileLoadTest extends LoadTest {
         options.trustStoreFile = TRUST_STORE_FILE;
         options.trustStoreToken = "hugegraph";
 
-        HugeClient httpsClient = null;
-        try {
-            httpsClient = HugeClientHolder.create(options);
-            List<Vertex> vertices = httpsClient.graph().listVertices();
-            Assert.assertEquals(2, vertices.size());
-        } finally {
-            clearAndClose(httpsClient, GRAPH);
-        }
+        List<Vertex> vertices = CLIENT.graph().listVertices();
+        Assert.assertEquals(2, vertices.size());
     }
 }
