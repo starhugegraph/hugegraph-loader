@@ -99,12 +99,14 @@ public final class LoadOptions {
     public int port = 8080;
 
     @Parameter(names = {"--username"}, arity = 1,
-            description = "The username of graph for authentication")
-    public String username = null;
+            description = "The username of graph for authentication, default " +
+                    "'admin'")
+    public String username = "admin";
 
     @Parameter(names = {"--password"}, arity = 1,
-            description = "The password of graph for authentication")
-    public String password = null;
+            description = "The password of graph for authentication, default " +
+                    "'admin'")
+    public String password = "admin";
 
     @Parameter(names = {"--protocol"}, arity = 1,
             validateWith = {ProtocolValidator.class},
