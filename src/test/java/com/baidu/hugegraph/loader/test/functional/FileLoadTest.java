@@ -256,7 +256,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
-            HugeGraphLoader.main(args1);
+            testmain(args1);
         }, (e) -> {
             String msg = e.getMessage();
             Assert.assertTrue(msg.startsWith("Failed to convert value"));
@@ -272,7 +272,7 @@ public class FileLoadTest extends LoadTest {
                 "--batch-insert-threads", "2",
                 "--test-mode", "true"
         };
-        HugeGraphLoader.main(args2);
+        testmain(args2);
 
         List<Vertex> vertices = CLIENT.graph().listVertices();
         Assert.assertEquals(5, vertices.size());

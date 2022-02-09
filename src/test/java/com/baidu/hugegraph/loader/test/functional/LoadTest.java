@@ -162,6 +162,6 @@ public class LoadTest {
             list.add("admin");
             args = (String[]) list.toArray(new String[list.size()]);
 
-            testmain(args);
+            HugeGraphLoader.main(args);
     }
 }
