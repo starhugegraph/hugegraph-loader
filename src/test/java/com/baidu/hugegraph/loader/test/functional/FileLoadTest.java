@@ -231,6 +231,8 @@ public class FileLoadTest extends LoadTest {
         options.host = Constants.HTTP_PREFIX + SERVER;
         options.port = PORT;
         options.graph = GRAPH;
+        options.username = USERNAME;
+        options.password = PASSWORD;
         HugeClient client = HugeClientHolder.create(options);
         SchemaManager schema = client.schema();
         schema.propertyKey("name").asText().ifNotExist().create();
@@ -252,7 +254,7 @@ public class FileLoadTest extends LoadTest {
                 "-f", structPath("clear_schema_before_load/struct.json"),
                 "-g", GRAPH,
                 "-h", SERVER,
-                "--batch-insert-threads", "2",
+                "--batch-insert-threads", "1",
                 "--test-mode", "true"
         };
         AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
@@ -418,7 +420,7 @@ public class FileLoadTest extends LoadTest {
                 "--test-mode", "true",
                 "--clear-all-data","true"
         };
-        AsyncThrowsAssert.assertThrows(ParseException.class, () -> {
+        AsyncThrowsAssert.assertThrows(ServerException.class, () -> {
             testmain(args);
         });
     }
