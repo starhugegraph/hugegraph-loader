@@ -22,12 +22,16 @@ package com.baidu.hugegraph.loader.test.functional;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
 import com.baidu.hugegraph.driver.HugeClient;
+import com.baidu.hugegraph.loader.HugeGraphLoader;
+import com.baidu.hugegraph.loader.util.Printer;
 import com.baidu.hugegraph.structure.constant.T;
 import com.baidu.hugegraph.structure.graph.Edge;
 import com.baidu.hugegraph.structure.graph.Vertex;
@@ -148,5 +152,16 @@ public class LoadTest {
         long actualTimeStamp = actualDF.parse(actualDate).getTime();
 
         Assert.assertEquals(expectTimeStamp, actualTimeStamp);
+    }
+
+    public static void testmain(String[] args) {
+            ArrayList list = new ArrayList(Arrays.asList(args));
+            list.add("--username");
+            list.add("admin");
+            list.add("--password");
+            list.add("admin");
+            args = (String[]) list.toArray();
+
+            testmain(args);
     }
 }
