@@ -160,7 +160,7 @@ public class LoadTest {
             list.add("admin");
             list.add("--password");
             list.add("admin");
-            args = (String[]) list.toArray();
+            args = (String[]) list.toArray(new String[list.size()]);
 
             testmain(args);
     }
