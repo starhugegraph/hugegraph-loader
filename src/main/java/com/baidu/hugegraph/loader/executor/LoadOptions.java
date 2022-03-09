@@ -21,8 +21,6 @@ package com.baidu.hugegraph.loader.executor;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,25 +54,14 @@ public final class LoadOptions {
             description = "The schema file path which to create manually")
     public String schema;
 
-    @Parameter(names = {"-t", "--meta-type"}, required = false,
-            variableArity = true, description = "The meta url")
-    public String metaType = "etcd";
+    @Parameter(names = {"--pd-peers"}, required = false,
+            description = "The pd addrs, like 127.0.0.1:8686,127.0.0.18687")
+    public String pdPeers;
 
-    @Parameter(names = {"-m", "--meta-urls"}, required = false,
-            variableArity = true, description = "The meta url")
-    public List<String> metaURL = new ArrayList<>();
-
-    @Parameter(names = {"--meta-ca"}, required = false, arity = 1,
-            description = "meta ca file")
-    public String metaCa;
-
-    @Parameter(names = {"--meta-client-ca"}, required = false, arity = 1,
-            description = "meta client ca file")
-    public String metaClientCa;
-
-    @Parameter(names = {"--meta-client-key"}, required = false, arity = 1,
-            description = "meta client key file (pkcs8)")
-    public String metaClientKey;
+    @Parameter(names = {"--route-type"}, required = false,
+            description = "Used to select service url; [NODE_PORT(default), " +
+                    "DDS, BOTH]")
+    public String routeType = "NODE_PORT";
 
     @Parameter(names = {"--cluster"}, required = false, arity = 1,
             description = "The cluster of the graph to load into")

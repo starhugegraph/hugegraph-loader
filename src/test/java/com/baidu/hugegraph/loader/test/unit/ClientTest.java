@@ -1,14 +1,14 @@
 package com.baidu.hugegraph.loader.test.unit;
 
-import com.baidu.hugegraph.driver.factory.MetaHugeClientFactory;
+import com.baidu.hugegraph.driver.factory.PDHugeClientFactory;
 import org.junit.Test;
 
 public class ClientTest {
     @Test
     public void testMetaHugeGraphFactory() {
-        MetaHugeClientFactory factory =
-                MetaHugeClientFactory.connect(null, new String[]{"http://localhost:2379"});
+        PDHugeClientFactory factory =
+                new PDHugeClientFactory("");
 
-        factory.listGraphSpaces("hg").stream().forEach(System.out::println);
+        factory.getAutoURLs("hg", null, null).stream().forEach(System.out::println);
     }
 }
