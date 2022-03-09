@@ -21,12 +21,11 @@ package com.baidu.hugegraph.loader.util;
 
 import java.nio.file.Paths;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.baidu.hugegraph.driver.HugeClient;
 import com.baidu.hugegraph.driver.HugeClientBuilder;
-import com.baidu.hugegraph.driver.factory.MetaHugeClientFactory;
+import com.baidu.hugegraph.driver.factory.PDHugeClientFactory;
 import com.baidu.hugegraph.exception.ServerException;
 import com.baidu.hugegraph.loader.constant.Constants;
 import com.baidu.hugegraph.loader.exception.LoadException;
@@ -37,7 +36,7 @@ import com.baidu.hugegraph.util.E;
 public final class HugeClientHolder {
 
     public static HugeClient create(LoadOptions options) {
-        if (CollectionUtils.isNotEmpty(options.metaURL)) {
+        if (StringUtils.isNotEmpty(options.pdPeers)) {
             return createFromMeta(options);
         }
 
@@ -124,22 +123,8 @@ public final class HugeClientHolder {
                 options.username : options.graph;
         HugeClientBuilder builder;
 
-        MetaHugeClientFactory clientFactory;
-
-        MetaHugeClientFactory.MetaDriverType type
-                = MetaHugeClientFactory.MetaDriverType
-                                       .valueOf(options.metaType.toUpperCase());
-        if (StringUtils.isNotEmpty(options.metaCa)) {
-            clientFactory = MetaHugeClientFactory.connect(
-                    type,
-                    options.metaURL.toArray(new String[0]), options.metaCa,
-                    options.metaClientCa,
-                    options.metaClientKey);
-        } else {
-            clientFactory = MetaHugeClientFactory.connect(
-                    MetaHugeClientFactory.MetaDriverType.ETCD,
-                    options.metaURL.toArray(new String[0]));
-        }
+        PDHugeClientFactory clientFactory =
+                new PDHugeClientFactory(options.pdPeers, options.routeType);
 
         try {
             HugeClient client =
