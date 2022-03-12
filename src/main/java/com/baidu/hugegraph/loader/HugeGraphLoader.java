@@ -27,12 +27,13 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import com.baidu.hugegraph.util.ExecutorUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
+import com.baidu.hugegraph.exception.ServerException;
+import com.baidu.hugegraph.util.ExecutorUtil;
 import com.baidu.hugegraph.driver.HugeClient;
 import com.baidu.hugegraph.loader.builder.Record;
 import com.baidu.hugegraph.loader.constant.Constants;
@@ -131,6 +132,17 @@ public final class HugeGraphLoader {
             // Print load summary
             Printer.printSummary(this.context);
         } catch (Throwable t) {
+            if (t instanceof ServerException) {
+                ServerException e = (ServerException) t;
+                String logMessage =
+                        "Log ServerException: \n" + e.exception() + "\n";
+                if (e.trace() != null) {
+                    logMessage += StringUtils.join((List<String>) e.trace(),
+                                                   "\n");
+                }
+                LOG.warn(logMessage);
+            }
+
             RuntimeException e = LoadUtil.targetRuntimeException(t);
             Printer.printError("Failed to load", e);
             e.printStackTrace();
