@@ -155,6 +155,10 @@ public final class DataTypeUtil {
             }
         } else if (dataType.isUUID()) {
             return parseUUID(key, value);
+        } else if (dataType.isText()) {
+            if (value instanceof Number) {
+                return value.toString();
+            }
         }
         E.checkArgument(checkDataType(key, value, dataType),
                         "The value(key='%s') '%s'(%s) is not match with " +
