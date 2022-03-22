@@ -20,7 +20,10 @@
 package com.baidu.hugegraph.loader.util;
 
 import java.nio.file.Paths;
+import java.util.List;
 
+import com.baidu.hugegraph.util.UrlParseUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.baidu.hugegraph.driver.HugeClient;
@@ -37,7 +40,7 @@ public final class HugeClientHolder {
 
     public static HugeClient create(LoadOptions options) {
         if (StringUtils.isNotEmpty(options.pdPeers)) {
-            return createFromMeta(options);
+            pickHostFromMeta(options);
         }
 
         boolean useHttps = options.protocol != null &&
@@ -118,59 +121,30 @@ public final class HugeClientHolder {
         }
     }
 
-    protected static HugeClient createFromMeta(LoadOptions options) {
-        String username = options.username != null ?
-                options.username : options.graph;
-        HugeClientBuilder builder;
-
+    protected static void pickHostFromMeta(LoadOptions options) {
         PDHugeClientFactory clientFactory =
                 new PDHugeClientFactory(options.pdPeers, options.routeType);
 
-        try {
-            HugeClient client =
-                    clientFactory.createAuthClient(options.cluster,
-                                                   options.graphSpace,
-                                                   options.graph,
-                                                   options.token,
-                                                   options.username,
-                                                   options.password);
-            return client;
-        } catch (IllegalStateException e) {
-            String message = e.getMessage();
-            if (message != null && message.startsWith("The version")) {
-                throw new LoadException("The version of hugegraph-client and " +
-                                        "hugegraph-server don't match", e);
-            }
-            throw e;
-        } catch (ServerException e) {
-            String message = e.getMessage();
-            if (Constants.STATUS_UNAUTHORIZED == e.status() ||
-                    (message != null && message.startsWith("Authentication"))) {
-                throw new LoadException("Incorrect username or password", e);
-            }
-            throw e;
-        } catch (ClientException e) {
-            Throwable cause = e.getCause();
-            if (cause == null || cause.getMessage() == null) {
-                throw e;
-            }
-            String message = cause.getMessage();
-            if (message.contains("Connection refused")) {
-                throw new LoadException("The service %s:%s is unavailable", e,
-                                        options.host, options.port);
-            } else if (message.contains("java.net.UnknownHostException") ||
-                    message.contains("Host name may not be null")) {
-                throw new LoadException("The host %s is unknown", e,
-                                        options.host);
-            } else if (message.contains("connect timed out")) {
-                throw new LoadException("Connect service %s:%s timeout, " +
-                                        "please check service is available " +
-                                        "and network is unobstructed", e,
-                                        options.host, options.port);
-            }
-            throw e;
-        } finally {
-            clientFactory.close();
+        List<String> urls = clientFactory.getAutoURLs(options.cluster,
+                                                      options.graphSpace, null);
+
+        E.checkState(CollectionUtils.isNotEmpty(urls), "No avaliable service!");
+
+        int r = (int) Math.floor(Math.random() * urls.size());
+        String url = urls.get(r);
+
+        UrlParseUtil.Host hostInfo = UrlParseUtil.parseHost(url);
+
+        E.checkState(StringUtils.isNotEmpty(hostInfo.getHost()),
+                     "Parse url ({}) from pd meta error", url);
+
+        options.host = hostInfo.getHost();
+        options.port = hostInfo.getPort();
+
+        if (StringUtils.isNotEmpty(hostInfo.getScheme())) {
+            options.protocol = hostInfo.getScheme();
         }
+
+        clientFactory.close();
     }
 }
