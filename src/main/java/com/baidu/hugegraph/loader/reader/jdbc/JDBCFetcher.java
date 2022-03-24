@@ -105,8 +105,8 @@ public class JDBCFetcher extends Fetcher {
         StringBuilder sb = new StringBuilder();
         sb.append("select * from ");
         sb.append(source.table());
-        if (StringUtils.isNotEmpty(source.getWhere())) {
-            sb.append(" where " + source.getWhere());
+        if (StringUtils.isNotEmpty(source.getWhere().trim())) {
+            sb.append(" where " + source.getWhere().trim());
         }
 
         return sb.toString();
