@@ -61,8 +61,8 @@ public class JDBCFetcher extends Fetcher {
     public  List<Line> nextBatch() throws SQLException {
         if (!start) {
             stmt = this.conn.createStatement();
-            //use fields instead of * , from json ?
-            result = stmt.executeQuery("select * from " + source.table());
+            // use fields instead of * , from json ?
+            result = stmt.executeQuery(buildSql());
             result.setFetchSize(source.batchSize());
             ResultSetMetaData metaData = result.getMetaData();
             columns = new String[metaData.getColumnCount()];
@@ -99,5 +99,16 @@ public class JDBCFetcher extends Fetcher {
             }
         }
         return lines;
+    }
+
+    public String buildSql() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from ");
+        sb.append(source.table());
+        if (StringUtils.isNotEmpty(source.getWhere())) {
+            sb.append(" where " + source.getWhere());
+        }
+
+        return sb.toString();
     }
 }

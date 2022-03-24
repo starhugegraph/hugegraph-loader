@@ -43,6 +43,8 @@ public class JDBCSource extends AbstractSource {
     private String schema;
     @JsonProperty("table")
     private String table;
+    @JsonProperty("where")
+    private String where;
     @JsonProperty("username")
     private String username;
     @JsonProperty("password")
@@ -96,6 +98,10 @@ public class JDBCSource extends AbstractSource {
 
     public String table() {
         return this.table;
+    }
+
+    public String getWhere() {
+        return where;
     }
 
     public String username() {
