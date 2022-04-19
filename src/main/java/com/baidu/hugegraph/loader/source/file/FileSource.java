@@ -19,6 +19,8 @@
 
 package com.baidu.hugegraph.loader.source.file;
 
+import java.util.List;
+
 import com.baidu.hugegraph.loader.constant.Constants;
 import com.baidu.hugegraph.loader.source.AbstractSource;
 import com.baidu.hugegraph.loader.source.SourceType;
@@ -27,6 +29,7 @@ import com.baidu.hugegraph.util.E;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.google.common.collect.ImmutableList;
 
 @JsonPropertyOrder({"type", "path", "file_filter"})
 public class FileSource extends AbstractSource {
@@ -43,6 +46,8 @@ public class FileSource extends AbstractSource {
     private String delimiter;
     @JsonProperty("date_format")
     private String dateFormat;
+    @JsonProperty("extra_date_formats")
+    private List<String> extraDateFormats;
     @JsonProperty("time_zone")
     private String timeZone;
     @JsonProperty("skipped_line")
@@ -54,7 +59,8 @@ public class FileSource extends AbstractSource {
 
     public FileSource() {
         this(null, new DirFilter(), new FileFilter(), FileFormat.CSV,
-             Constants.COMMA_STR, Constants.DATE_FORMAT, Constants.TIME_ZONE,
+             Constants.COMMA_STR, Constants.DATE_FORMAT,
+             ImmutableList.of(), Constants.TIME_ZONE,
              new SkippedLine(), Compression.NONE, 500);
     }
 
@@ -65,6 +71,8 @@ public class FileSource extends AbstractSource {
                       @JsonProperty("format") FileFormat format,
                       @JsonProperty("delimiter") String delimiter,
                       @JsonProperty("date_format") String dateFormat,
+                      @JsonProperty("extra_date_formats")
+                      List<String> extraDateFormats,
                       @JsonProperty("time_zone") String timeZone,
                       @JsonProperty("skipped_line") SkippedLine skippedLine,
                       @JsonProperty("compression") Compression compression,
@@ -77,6 +85,9 @@ public class FileSource extends AbstractSource {
                          delimiter : this.format.delimiter();
         this.dateFormat = dateFormat != null ?
                           dateFormat : Constants.DATE_FORMAT;
+        this.extraDateFormats = extraDateFormats == null ||
+                                extraDateFormats.isEmpty() ?
+                                ImmutableList.of() : extraDateFormats;
         this.timeZone = timeZone != null ? timeZone : Constants.TIME_ZONE;
         this.skippedLine = skippedLine != null ?
                            skippedLine : new SkippedLine();
@@ -158,6 +169,14 @@ public class FileSource extends AbstractSource {
         this.dateFormat = dateFormat;
     }
 
+    public List<String> extraDateFormats() {
+        return this.extraDateFormats;
+    }
+
+    public void extraDateFormats(List<String> extraDateFormats) {
+        this.extraDateFormats = extraDateFormats;
+    }
+
     public String timeZone() {
         return this.timeZone;
     }
@@ -202,6 +221,7 @@ public class FileSource extends AbstractSource {
         source.format = this.format;
         source.delimiter = this.delimiter;
         source.dateFormat = this.dateFormat;
+        source.extraDateFormats = this.extraDateFormats;
         source.skippedLine = this.skippedLine;
         source.compression = this.compression;
         return source;
