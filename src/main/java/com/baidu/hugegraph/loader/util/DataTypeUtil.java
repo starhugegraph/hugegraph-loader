@@ -140,9 +140,25 @@ public final class DataTypeUtil {
             return parseBoolean(key, value);
         } else if (dataType.isDate()) {
             if (source instanceof FileSource || source instanceof HDFSSource) {
+                List<String> extraDateFormats =
+                        ((FileSource) source).extraDateFormats();
                 String dateFormat = ((FileSource) source).dateFormat();
                 String timeZone = ((FileSource) source).timeZone();
-                return parseDate(key, value, dateFormat, timeZone);
+                if (extraDateFormats == null || extraDateFormats.isEmpty()) {
+                    return parseDate(key, value, dateFormat, timeZone);
+                } else {
+                    extraDateFormats.add(0, dateFormat);
+                    int size = extraDateFormats.size();
+                    for (String df : extraDateFormats) {
+                        try {
+                            return parseDate(key, value, df, timeZone);
+                        } catch (Exception e) {
+                            if (--size <= 0) {
+                                throw e;
+                            }
+                        }
+                    }
+                }
             }
             if (source instanceof JDBCSource) {
                 if (value instanceof java.sql.Date) {
