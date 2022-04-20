@@ -89,6 +89,7 @@ public class MappingConverterTest {
                 "\"dir_filter\":{\"include_regex\":\"\",\"exclude_regex\":\"\"}," +
                 "\"format\":\"TEXT\",\"delimiter\":\"::\"," +
                 "\"date_format\":\"yyyy-MM-dd HH:mm:ss\"," +
+                "\"extra_date_formats\":[]," +
                 "\"time_zone\":\"GMT+8\",\"skipped_line\":{\"regex\":\"" +
                 "(^#|^//).*|\"},\"compression\":\"NONE\"," +
                 "\"batch_size\":500,\"header\":[\"UserID\",\"Gender\"," +
@@ -107,6 +108,7 @@ public class MappingConverterTest {
                 "\"dir_filter\":{\"include_regex\":\"\",\"exclude_regex\":\"\"}," +
                 "\"format\":\"TEXT\",\"delimiter\":\"::\"," +
                 "\"date_format\":\"yyyy-MM-dd HH:mm:ss\"," +
+                "\"extra_date_formats\":[]," +
                 "\"time_zone\":\"GMT+8\",\"skipped_line\":{\"regex\":\"" +
                 "(^#|^//).*|\"},\"compression\":\"NONE\"," +
                 "\"batch_size\":500,\"header\":[\"UserID\",\"MovieID\"," +
