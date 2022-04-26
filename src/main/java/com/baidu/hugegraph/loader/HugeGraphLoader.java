@@ -89,7 +89,10 @@ public final class HugeGraphLoader {
             Printer.printError("Failed to start loading", e);
             return;
         }
-        loader.load();
+        boolean noerror = loader.load();
+        if (!noerror) {
+            System.exit(1);
+        }
     }
 
     public HugeGraphLoader(String[] args) {
@@ -132,6 +135,8 @@ public final class HugeGraphLoader {
             // Print load summary
             Printer.printSummary(this.context);
         } catch (Throwable t) {
+            this.context.occuredError();
+
             if (t instanceof ServerException) {
                 ServerException e = (ServerException) t;
                 String logMessage =
@@ -325,15 +330,20 @@ public final class HugeGraphLoader {
 
         LOG.info("waiting for loading finish {}", loadTasks.size());
         // wait for finish
-        CompletableFuture.allOf(loadTasks.toArray(new CompletableFuture[0]))
-                .join();
+        try {
+            CompletableFuture.allOf(loadTasks.toArray(new CompletableFuture[0]))
+                             .join();
+        } catch (Throwable t) {
+            throw t;
+        } finally {
+            // 关闭service
+            service.shutdown();
 
-        service.shutdown();
-
-        for (InputTaskItem item : taskItems) {
-            item.reader.close();
+            for (InputTaskItem item : taskItems) {
+                item.reader.close();
+            }
+            LOG.info("load end");
         }
-        LOG.info("load finish");
     }
 
     private CompletableFuture<Void> asyncLoadStruct(
