@@ -339,9 +339,9 @@ public final class HugeGraphLoader {
             // 关闭service
             service.shutdown();
 
-            for (InputTaskItem item : taskItems) {
-                item.reader.close();
-            }
+            // for (InputTaskItem item : taskItems) {
+            //     item.reader.close();
+            // }
             LOG.info("load end");
         }
     }
@@ -349,7 +349,13 @@ public final class HugeGraphLoader {
     private CompletableFuture<Void> asyncLoadStruct(
             InputStruct struct, InputReader reader, ExecutorService service) {
         return CompletableFuture.runAsync(() -> {
-                this.loadStruct(struct, reader);
+                try {
+                    this.loadStruct(struct, reader);
+                } catch (Throwable t) {
+                    throw t;
+                } finally {
+                    reader.close();
+                }
             }, service);
     }
 
