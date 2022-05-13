@@ -126,6 +126,12 @@ public abstract class ElementBuilder<GE extends GraphElement> {
         if (nullableKeys.isEmpty() || nullValues.isEmpty()) {
             return true;
         }
+
+        // 当filedValue为空，且schema允许为空
+        if (fieldValue == null && nullableKeys.contains(mappedKey)) {
+            return false;
+        }
+
         return !nullableKeys.contains(mappedKey) ||
                !nullValues.contains(fieldValue);
     }
@@ -191,7 +197,8 @@ public abstract class ElementBuilder<GE extends GraphElement> {
     private void customizeId(VertexLabel vertexLabel, Vertex vertex,
                              String idField, Object idValue) {
         E.checkArgumentNotNull(idField, "The vertex id field can't be null");
-        E.checkArgumentNotNull(idValue, "The vertex id value can't be null");
+        E.checkArgumentNotNull(idValue, "The vertex id value of field(%s)" +
+                " can't be null", idField);
         IdStrategy idStrategy = vertexLabel.idStrategy();
         if (idStrategy.isCustomizeString()) {
             String id = (String) idValue;
@@ -219,10 +226,11 @@ public abstract class ElementBuilder<GE extends GraphElement> {
             return;
         }
         // NOTE: The nullable values has been filtered before this
-        E.checkArgument(fieldValue != null, "The field value can't be null");
+        E.checkArgument(fieldValue != null, "The field(%s) value can't be " +
+                "null", fieldName);
         E.checkArgument(DataTypeUtil.isSimpleValue(fieldValue),
-                        "The field value must be simple type, actual is '%s'",
-                        fieldValue.getClass());
+                        "The field(%s) value must be simple type, actual is " +
+                                "'%s'", fieldName, fieldValue.getClass());
     }
 
     private boolean vertexIdEmpty(VertexLabel vertexLabel, Vertex vertex) {
