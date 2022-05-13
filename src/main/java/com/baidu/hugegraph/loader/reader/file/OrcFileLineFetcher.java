@@ -149,6 +149,9 @@ public class OrcFileLineFetcher extends FileLineFetcher {
         if (this.recordReader != null) {
             this.recordReader.close();
         }
+        if (this.reader != null) {
+            this.reader.close();
+        }
     }
 
     private String[] parseHeader(StructObjectInspector inspector) {
