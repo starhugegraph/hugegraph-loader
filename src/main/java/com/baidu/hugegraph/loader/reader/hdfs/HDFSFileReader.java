@@ -205,6 +205,7 @@ public class HDFSFileReader extends FileReader {
         if (this.source().hdfsSitePath() != null) {
             conf.addResource(new Path(this.source().hdfsSitePath()));
         }
+        conf.setBoolean("fs.hdfs.impl.disable.cache", true);
         return conf;
     }
 
