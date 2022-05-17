@@ -161,6 +161,9 @@ public abstract class FileReader extends AbstractReader {
         } catch (IOException e) {
             LOG.warn("Failed to close reader for {} with exception {}",
                      this.source, e);
+        } finally {
+            // 强制释放占用资源
+            this.fetcher = null;
         }
     }
 
