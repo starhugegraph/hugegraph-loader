@@ -174,11 +174,17 @@ public final class HugeGraphLoader {
         options.timeout = options.clearTimeout;
         HugeClient client = HugeClientHolder.create(options);
 
-        LOG.info("Prepare to clear the data of graph '{}'", options.graph);
-        client.graphs().clear(options.graph);
-        LOG.info("The graph '{}' has been cleared successfully", options.graph);
-        options.timeout = requestTimeout;
-        client.close();
+        try {
+            LOG.info("Prepare to clear the data of graph '{}'", options.graph);
+            client.graphs().clear(options.graph);
+            LOG.info("The graph '{}' has been cleared successfully",
+                     options.graph);
+            options.timeout = requestTimeout;
+        } catch (Throwable t) {
+            throw t;
+        } finally {
+            client.close();
+        }
     }
 
     private void createSchema() {

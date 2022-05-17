@@ -147,20 +147,21 @@ public final class LoadContext {
     }
 
     public void unsetLoadingMode() {
+        HugeClient flushClient = HugeClientHolder.create(options);
         try {
             int requestTimeout = options.timeout;
             options.timeout = options.flushTimeout;
-            HugeClient flushClient = HugeClientHolder.create(options);
             String graph = flushClient.graph().graph();
             GraphMode mode = flushClient.graphs().mode(graph);
             if (mode.loading()) {
                 flushClient.graphs().mode(graph, GraphMode.NONE);
             }
             options.timeout = requestTimeout;
-            flushClient.close();
         } catch (Exception e) {
             throw new LoadException("Failed to unset mode %s for server",
                                     e, GraphMode.LOADING);
+        } finally {
+            flushClient.close();
         }
     }
 
