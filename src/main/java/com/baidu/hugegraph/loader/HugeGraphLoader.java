@@ -89,8 +89,8 @@ public final class HugeGraphLoader {
             Printer.printError("Failed to start loading", e);
             return;
         }
-        boolean noerror = loader.load();
-        if (!noerror) {
+        boolean isSuccess = loader.load();
+        if (!isSuccess) {
             System.exit(1);
         }
     }
@@ -154,10 +154,14 @@ public final class HugeGraphLoader {
             if (this.context.options().testMode) {
                 throw e;
             }
+
+            return false;
         } finally {
             this.stopThenShutdown();
         }
-        return this.context.noError();
+
+        // 任务执行成功
+        return true;
     }
 
     private void clearAllDataIfNeeded() {
