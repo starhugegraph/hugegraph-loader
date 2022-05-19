@@ -59,7 +59,33 @@ CP="$CP":$(find -L ${LIB} -name '*.jar' \
 export LOADER_CLASSPATH="${CLASSPATH:-}:$CP"
 
 # Xmx needs to be set so that it is big enough to cache all the vertexes in the run
-export JVM_OPTS="$JVM_OPTS -Xmx10g -cp $LOADER_CLASSPATH"
+# export JVM_OPTS="$JVM_OPTS -Xmx10g -cp $LOADER_CLASSPATH"
+jpoint="";
+jparam="";
+for arg in "$@"
+    do
+        if [[ $jpoint == "-j" ]] && [ ! -n "$jparam" ]
+        then        
+            jparam=$arg
+        fi
+        
+        if [ $arg == "-j" ]
+        then
+            jpoint=$arg 
+        fi
+    done
+
+if [ ! -n "$jparam" ]
+then
+    export JVM_OPTS="$JVM_OPTS -Xmx10g -cp $LOADER_CLASSPATH"
+else
+    export VARS=${VARS//-j/""}
+    export VARS=${VARS//$jparam/""}
+    export JVM_OPTS="$JVM_OPTS $jparam -cp $LOADER_CLASSPATH"
+fi
+
+#echo ${VARS}
+#echo ${JVM_OPTS}
 
 # Uncomment to enable debugging
 #JVM_OPTS="$JVM_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=1414"
