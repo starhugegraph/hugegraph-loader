@@ -95,6 +95,11 @@ public abstract class FileReader extends AbstractReader {
             throw new InitException("Failed to scan readable files for '%s'",
                                     e, this.source);
         }
+
+        if (readableList.size() == 0) {
+            return  new ArrayList<>();
+        }
+
         this.fetcher = this.createLineFetcher();
         this.fetcher.readHeaderIfNeeded(readableList);
 
