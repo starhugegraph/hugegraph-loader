@@ -19,6 +19,7 @@
 
 package com.baidu.hugegraph.loader.mapping;
 
+import java.sql.Struct;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -142,12 +143,23 @@ public abstract class ElementMapping implements Checkable {
         this.mappingFields = mappingFields;
     }
 
-    public String mappingField(String fieldName) {
+    public String mappingField(String fieldName, boolean caseSensitive) {
         if (this.mappingFields.isEmpty()) {
             return fieldName;
         }
-        String mappingName = this.mappingFields.get(fieldName);
-        return mappingName != null ? mappingName : fieldName;
+        if (caseSensitive) {
+            String mappingName = this.mappingFields.get(fieldName);
+            return mappingName != null ? mappingName : fieldName;
+        } else {
+            // header name 不区分大小写
+            for (Map.Entry<String, String> entry: this.mappingFields.entrySet()) {
+                if (entry.getKey().toLowerCase().equals(fieldName.toLowerCase())) {
+                    return entry.getValue();
+                }
+            }
+            
+            return fieldName;
+        }
     }
 
     public Map<String, Map<String, Object>> mappingValues() {
@@ -158,16 +170,33 @@ public abstract class ElementMapping implements Checkable {
         this.mappingValues = mappingValues;
     }
 
-    public Object mappingValue(String fieldName, String rawValue) {
+    public Object mappingValue(String fieldName, String rawValue, boolean caseSensitive) {
         if (this.mappingValues.isEmpty()) {
             return rawValue;
         }
         Object mappingValue = rawValue;
-        Map<String, Object> values = this.mappingValues.get(fieldName);
-        if (values != null) {
-            Object value = values.get(rawValue);
-            if (value != null) {
-                mappingValue = value;
+
+        if (caseSensitive) {
+            Map<String, Object> values = this.mappingValues.get(fieldName);
+            if (values != null) {
+                Object value = values.get(rawValue);
+                if (value != null) {
+                    mappingValue = value;
+                }
+            }
+        } else {
+            for (Map.Entry<String, Map<String, Object>> entry:
+                    this.mappingValues.entrySet()) {
+                if (entry.getKey().toLowerCase().equals(fieldName.toLowerCase())) {
+                    Map<String, Object> values = entry.getValue();
+                    if (values != null) {
+                        Object value = values.get(rawValue);
+                        if (value != null) {
+                            mappingValue = value;
+                            break;
+                        }
+                    }
+                }
             }
         }
         return mappingValue;

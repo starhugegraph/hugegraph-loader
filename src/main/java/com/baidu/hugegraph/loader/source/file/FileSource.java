@@ -231,4 +231,14 @@ public class FileSource extends AbstractSource {
     public String toString() {
         return String.format("%s(%s)", this.type(), this.path());
     }
+
+    @Override
+    public boolean headerCaseSensitive() {
+        if (Compression.ORC.equals(this.compression()) ||
+            Compression.PARQUET.equals(this.compression())) {
+            return false;
+        }
+
+        return true;
+    }
 }

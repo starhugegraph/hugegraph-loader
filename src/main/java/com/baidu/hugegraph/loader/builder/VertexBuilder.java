@@ -55,6 +55,8 @@ public class VertexBuilder extends ElementBuilder<Vertex> {
     public List<Vertex> build(String[] names, Object[] values) {
         VertexKVPairs kvPairs = this.newKVPairs(this.vertexLabel,
                                                 this.mapping.unfold());
+
+        kvPairs.headerCaseSensitive(this.headerCaseSensitive());
         kvPairs.extractFromVertex(names, values);
         return kvPairs.buildVertices(true);
     }
@@ -71,7 +73,11 @@ public class VertexBuilder extends ElementBuilder<Vertex> {
 
     @Override
     protected boolean isIdField(String fieldName) {
-        return fieldName.equals(this.mapping.idField());
+        if (this.headerCaseSensitive()) {
+            return fieldName.equals(this.mapping.idField());
+        } else {
+            return fieldName.toLowerCase().equals(this.mapping.idField().toLowerCase());
+        }
     }
 
     private void checkIdField() {

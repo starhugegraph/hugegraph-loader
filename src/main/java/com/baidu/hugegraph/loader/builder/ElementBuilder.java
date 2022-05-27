@@ -81,6 +81,19 @@ public abstract class ElementBuilder<GE extends GraphElement> {
 
     protected abstract boolean isIdField(String fieldName);
 
+    // builder是否区分header大小写
+    protected boolean headerCaseSensitive() {
+        return this.struct.input().headerCaseSensitive();
+    }
+
+    protected boolean headerEqual(String header1, String header2) {
+        if (this.headerCaseSensitive()) {
+            return header1.equals(header2);
+        } else {
+            return header1.toLowerCase().equals(header2.toLowerCase());
+        }
+    }
+
     @SuppressWarnings("unchecked")
     protected Collection<String> nonNullableKeys(SchemaLabel schemaLabel) {
         return CollectionUtils.subtract(schemaLabel.properties(),
@@ -106,6 +119,45 @@ public abstract class ElementBuilder<GE extends GraphElement> {
         }
     }
 
+    protected boolean isSelectedField(String fieldName) {
+        ElementMapping mapping = this.mapping();
+        Set<String> selectedFields = mapping.selectedFields();
+
+        if (this.headerCaseSensitive()) {
+            if (selectedFields.contains(fieldName)) {
+                return true;
+            }
+        } else {
+            for (String selectedField : selectedFields) {
+                if (headerEqual(selectedField, fieldName)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected boolean isIgnoreddField(String fieldName) {
+        ElementMapping mapping = this.mapping();
+        Set<String> ignoredFields = mapping.ignoredFields();
+
+        if (this.headerCaseSensitive()) {
+            if (ignoredFields.contains(fieldName)) {
+                return true;
+            }
+        } else {
+            for (String ignoredField : ignoredFields) {
+                if (headerEqual(ignoredField, fieldName)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
     /**
      * Retain only the key-value pairs needed by the current vertex or edge
      */
@@ -114,13 +166,15 @@ public abstract class ElementBuilder<GE extends GraphElement> {
         Set<String> selectedFields = mapping.selectedFields();
         Set<String> ignoredFields = mapping.ignoredFields();
         // Retain selected fields or remove ignored fields
-        if (!selectedFields.isEmpty() && !selectedFields.contains(fieldName)) {
+        if (!isSelectedField(fieldName)) {
             return false;
         }
-        if (!ignoredFields.isEmpty() && ignoredFields.contains(fieldName)) {
+        if (isIgnoreddField(fieldName)) {
             return false;
         }
-        String mappedKey = mapping.mappingField(fieldName);
+
+        String mappedKey = mappingField(fieldName);
+
         Set<String> nullableKeys = this.schemaLabel().nullableKeys();
         Set<Object> nullValues = mapping.nullValues();
         if (nullableKeys.isEmpty() || nullValues.isEmpty()) {
@@ -191,7 +245,13 @@ public abstract class ElementBuilder<GE extends GraphElement> {
             return fieldValue;
         }
         String fieldStrValue = String.valueOf(fieldValue);
-        return this.mapping().mappingValue(fieldName, fieldStrValue);
+        return this.mapping().mappingValue(fieldName, fieldStrValue,
+                                           this.headerCaseSensitive());
+    }
+
+    protected String mappingField(String fileName) {
+        return this.mapping().mappingField(fileName,
+                                           this.headerCaseSensitive());
     }
 
     private void customizeId(VertexLabel vertexLabel, Vertex vertex,
@@ -311,9 +371,16 @@ public abstract class ElementBuilder<GE extends GraphElement> {
         // General properties
         public Map<String, Object> properties;
 
+        public boolean headerCaseSensitive;
+
+        public void headerCaseSensitive(boolean f) {
+            this.headerCaseSensitive = f;
+        }
         public VertexKVPairs(VertexLabel vertexLabel) {
             this.vertexLabel = vertexLabel;
             this.properties = null;
+
+            this.headerCaseSensitive = true;
         }
 
         public abstract void extractFromVertex(String[] names,
@@ -354,7 +421,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
                     this.idField = fieldName;
                     this.idValue = mappingValue(fieldName, fieldValue);
                 } else {
-                    String key = mapping().mappingField(fieldName);
+                    String key = mappingField(fieldName);
                     Object value = mappingValue(fieldName, fieldValue);
                     this.properties.put(key, value);
                 }
@@ -379,7 +446,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
                 return ImmutableList.of();
             }
             if (withProperty) {
-                String key = mapping().mappingField(this.idField);
+                String key = mappingField(this.idField);
                 // The id field is also used as a general property
                 if (vertexLabel.properties().contains(key)) {
                     addProperty(vertex, key, this.idValue);
@@ -423,7 +490,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
                         return mappingValue(fieldName, rawIdValue);
                     }).collect(Collectors.toList());
                 } else {
-                    String key = mapping().mappingField(fieldName);
+                    String key = mappingField(fieldName);
                     Object value = mappingValue(fieldName, fieldValue);
                     this.properties.put(key, value);
                 }
@@ -455,7 +522,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
                     continue;
                 }
                 if (withProperty) {
-                    String key = mapping().mappingField(this.idField);
+                    String key = mappingField(this.idField);
                     // The id field is also used as a general property
                     if (vertexLabel.properties().contains(key)) {
                         addProperty(vertex, key, idValue);
@@ -489,6 +556,10 @@ public abstract class ElementBuilder<GE extends GraphElement> {
         @Override
         public void extractFromVertex(String[] names, Object[] values) {
             List<String> primaryKeys = this.vertexLabel.primaryKeys();
+            List<String> lowerCasePrimaryKeys
+                    = primaryKeys.stream().map(k -> k.toLowerCase())
+                                 .collect(Collectors.toList());
+
             this.pkNames = primaryKeys;
             this.pkValues = new Object[primaryKeys.size()];
             // General properties
@@ -499,15 +570,29 @@ public abstract class ElementBuilder<GE extends GraphElement> {
                 if (!retainField(fieldName, fieldValue)) {
                     continue;
                 }
-                String key = mapping().mappingField(fieldName);
-                if (primaryKeys.contains(key)) {
-                    // Don't put priamry key/values into general properties
-                    int index = primaryKeys.indexOf(key);
-                    Object pkValue = mappingValue(fieldName, fieldValue);
-                    this.pkValues[index] = pkValue;
+                String key = mappingField(fieldName);
+
+                if (this.headerCaseSensitive) {
+                    if (primaryKeys.contains(key)) {
+                        // Don't put priamry key/values into general properties
+                        int index = primaryKeys.indexOf(key);
+                        Object pkValue = mappingValue(fieldName, fieldValue);
+                        this.pkValues[index] = pkValue;
+                    } else {
+                        Object value = mappingValue(fieldName, fieldValue);
+                        this.properties.put(key, value);
+                    }
                 } else {
-                    Object value = mappingValue(fieldName, fieldValue);
-                    this.properties.put(key, value);
+                    String lowerCaseKey = key.toLowerCase();
+                    if (lowerCasePrimaryKeys.contains(lowerCaseKey)) {
+                        // Don't put priamry key/values into general properties
+                        int index = lowerCasePrimaryKeys.indexOf(lowerCaseKey);
+                        Object pkValue = mappingValue(fieldName, fieldValue);
+                        this.pkValues[index] = pkValue;
+                    } else {
+                        Object value = mappingValue(fieldName, fieldValue);
+                        this.properties.put(key, value);
+                    }
                 }
             }
         }
@@ -518,7 +603,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
             this.pkNames = new ArrayList<>(fieldIndexes.length);
             for (int fieldIndex : fieldIndexes) {
                 String fieldName = names[fieldIndex];
-                String mappingField = mapping().mappingField(fieldName);
+                String mappingField = mappingField(fieldName);
                 this.pkNames.add(mappingField);
             }
             List<String> primaryKeys = this.vertexLabel.primaryKeys();
@@ -599,7 +684,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
                 if (!retainField(fieldName, fieldValue)) {
                     continue;
                 }
-                String key = mapping().mappingField(fieldName);
+                String key = mappingField(fieldName);
                 if (!handledPk && primaryKeys.contains(key)) {
                     // Don't put priamry key/values into general properties
                     List<Object> rawPkValues = splitField(fieldName,
@@ -623,7 +708,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
                             "In case unfold is true, just supported " +
                             "a single primary key");
             String fieldName = names[fieldIndexes[0]];
-            this.pkName = mapping().mappingField(fieldName);
+            this.pkName = mappingField(fieldName);
             String primaryKey = primaryKeys.get(0);
             E.checkArgument(this.pkName.equals(primaryKey),
                             "Make sure the the primary key field '%s' is " +
