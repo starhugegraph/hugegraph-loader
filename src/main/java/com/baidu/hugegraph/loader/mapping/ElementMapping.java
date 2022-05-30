@@ -19,7 +19,6 @@
 
 package com.baidu.hugegraph.loader.mapping;
 
-import java.sql.Struct;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -152,12 +151,14 @@ public abstract class ElementMapping implements Checkable {
             return mappingName != null ? mappingName : fieldName;
         } else {
             // header name 不区分大小写
-            for (Map.Entry<String, String> entry: this.mappingFields.entrySet()) {
-                if (entry.getKey().toLowerCase().equals(fieldName.toLowerCase())) {
+            for (Map.Entry<String, String> entry:
+                    this.mappingFields.entrySet()) {
+                if (entry.getKey().toLowerCase()
+                         .equals(fieldName.toLowerCase())) {
                     return entry.getValue();
                 }
             }
-            
+
             return fieldName;
         }
     }
@@ -170,7 +171,8 @@ public abstract class ElementMapping implements Checkable {
         this.mappingValues = mappingValues;
     }
 
-    public Object mappingValue(String fieldName, String rawValue, boolean caseSensitive) {
+    public Object mappingValue(String fieldName, String rawValue,
+                               boolean caseSensitive) {
         if (this.mappingValues.isEmpty()) {
             return rawValue;
         }
@@ -187,7 +189,8 @@ public abstract class ElementMapping implements Checkable {
         } else {
             for (Map.Entry<String, Map<String, Object>> entry:
                     this.mappingValues.entrySet()) {
-                if (entry.getKey().toLowerCase().equals(fieldName.toLowerCase())) {
+                if (entry.getKey().toLowerCase()
+                         .equals(fieldName.toLowerCase())) {
                     Map<String, Object> values = entry.getValue();
                     if (values != null) {
                         Object value = values.get(rawValue);

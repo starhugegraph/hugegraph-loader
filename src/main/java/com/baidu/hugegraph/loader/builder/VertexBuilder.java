@@ -76,7 +76,8 @@ public class VertexBuilder extends ElementBuilder<Vertex> {
         if (this.headerCaseSensitive()) {
             return fieldName.equals(this.mapping.idField());
         } else {
-            return fieldName.toLowerCase().equals(this.mapping.idField().toLowerCase());
+            return fieldName.toLowerCase()
+                            .equals(this.mapping.idField().toLowerCase());
         }
     }
 
