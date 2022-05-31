@@ -57,6 +57,9 @@ public class FileSource extends AbstractSource {
     @JsonProperty("batch_size")
     private int batchSize;
 
+    // header 是否需要区分大小写
+    private final boolean headerCaseSensitive;
+
     public FileSource() {
         this(null, new DirFilter(), new FileFilter(), FileFormat.CSV,
              Constants.COMMA_STR, Constants.DATE_FORMAT,
@@ -93,6 +96,14 @@ public class FileSource extends AbstractSource {
                            skippedLine : new SkippedLine();
         this.compression = compression != null ? compression : Compression.NONE;
         this.batchSize = batchSize != null ? batchSize : 500;
+
+        // 当输入为orc/parquet，header不区分大小写
+        if (Compression.ORC.equals(this.compression()) ||
+                Compression.PARQUET.equals(this.compression())) {
+            headerCaseSensitive = false;
+        } else {
+            headerCaseSensitive = true;
+        }
     }
 
     @Override
@@ -234,11 +245,6 @@ public class FileSource extends AbstractSource {
 
     @Override
     public boolean headerCaseSensitive() {
-        if (Compression.ORC.equals(this.compression()) ||
-            Compression.PARQUET.equals(this.compression())) {
-            return false;
-        }
-
-        return true;
+        return headerCaseSensitive;
     }
 }
