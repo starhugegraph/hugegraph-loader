@@ -90,7 +90,7 @@ public abstract class ElementBuilder<GE extends GraphElement> {
         if (this.headerCaseSensitive()) {
             return header1.equals(header2);
         } else {
-            return header1.toLowerCase().equals(header2.toLowerCase());
+            return header1.equalsIgnoreCase(header2);
         }
     }
 
@@ -123,6 +123,10 @@ public abstract class ElementBuilder<GE extends GraphElement> {
         ElementMapping mapping = this.mapping();
         Set<String> selectedFields = mapping.selectedFields();
 
+        if (selectedFields.isEmpty()) {
+            return true;
+        }
+
         if (this.headerCaseSensitive()) {
             if (selectedFields.contains(fieldName)) {
                 return true;
@@ -141,6 +145,10 @@ public abstract class ElementBuilder<GE extends GraphElement> {
     protected boolean isIgnoreddField(String fieldName) {
         ElementMapping mapping = this.mapping();
         Set<String> ignoredFields = mapping.ignoredFields();
+
+        if (ignoredFields.isEmpty()) {
+            return false;
+        }
 
         if (this.headerCaseSensitive()) {
             if (ignoredFields.contains(fieldName)) {

@@ -153,8 +153,7 @@ public abstract class ElementMapping implements Checkable {
             // header name 不区分大小写
             for (Map.Entry<String, String> entry:
                     this.mappingFields.entrySet()) {
-                if (entry.getKey().toLowerCase()
-                         .equals(fieldName.toLowerCase())) {
+                if (entry.getKey().equalsIgnoreCase(fieldName)) {
                     return entry.getValue();
                 }
             }
