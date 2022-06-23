@@ -49,6 +49,9 @@ public class SingleInsertTask extends InsertTask {
     public void execute() {
         long total = this.plusLoadSuccess(0);
         for (Record record : this.batch) {
+            if (this.context.stopped()) {
+                break;
+            }
             try {
                 if (this.mapping.updateStrategies().isEmpty()) {
                     this.insertSingle(this.options(), record);
@@ -83,6 +86,7 @@ public class SingleInsertTask extends InsertTask {
             }
             synchronized (this.context) {
                 if (!this.context.stopped()) {
+                    this.context.reachedMaxErrorLimit();
                     Printer.printError("More than %s %s insert error, " +
                                        "stop parsing and waiting other " +
                                        "insert tasks stopped",
