@@ -48,6 +48,8 @@ public final class LoadContext {
     private volatile boolean closed;
     private volatile boolean stopped;
     private volatile boolean noError;
+    // 标记错误条数是否达到最大值. maxReadError, maxParseError, maxInsertError
+    private volatile boolean errorLimit;
     private final LoadOptions options;
     private final LoadSummary summary;
     // The old progress just used to read
@@ -64,6 +66,7 @@ public final class LoadContext {
         this.closed = false;
         this.stopped = false;
         this.noError = true;
+        this.errorLimit = false;
         this.options = options;
         this.summary = new LoadSummary();
         this.oldProgress = LoadProgress.parse(options);
@@ -91,6 +94,14 @@ public final class LoadContext {
 
     public boolean noError() {
         return this.noError;
+    }
+
+    public boolean errorLimit() {
+        return this.errorLimit;
+    }
+
+    public void reachedMaxErrorLimit() {
+        this.errorLimit = true;
     }
 
     public void occuredError() {

@@ -87,6 +87,9 @@ public final class ParseTaskBuilder {
             List<Record> records = new ArrayList<>(batchSize);
             int count = 0;
             for (Line line : lines) {
+                if (this.context.stopped()) {
+                    break;
+                }
                 try {
                     // NOTE: don't remove entry in keyValues
                     @SuppressWarnings("unchecked")

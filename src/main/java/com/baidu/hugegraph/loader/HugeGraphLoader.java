@@ -132,8 +132,6 @@ public final class HugeGraphLoader {
             // Create schema
             this.createSchema();
             this.loadInputs();
-            // Print load summary
-            Printer.printSummary(this.context);
         } catch (Throwable t) {
             this.context.occuredError();
 
@@ -157,7 +155,14 @@ public final class HugeGraphLoader {
 
             return false;
         } finally {
+            // Print load summary
+            Printer.printSummary(this.context);
             this.stopThenShutdown();
+        }
+
+        // 失败条数到达最大值。
+        if (this.context().errorLimit()) {
+            return false;
         }
 
         // 任务执行成功
@@ -461,6 +466,7 @@ public final class HugeGraphLoader {
             Printer.printError("More than %s read error, stop reading and " +
                                "waiting all parse/insert tasks stopped",
                                options.maxReadErrors);
+            this.context.reachedMaxErrorLimit();
             this.context.stopLoading();
         }
     }
@@ -470,6 +476,8 @@ public final class HugeGraphLoader {
         long failures = this.context.summary().totalParseFailures();
         if (options.maxParseErrors != Constants.NO_LIMIT &&
             failures >= options.maxParseErrors) {
+            // 设置错误数到最大值。
+            this.context().reachedMaxErrorLimit();
             if (this.context.stopped()) {
                 return;
             }
