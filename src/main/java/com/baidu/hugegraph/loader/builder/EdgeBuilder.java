@@ -115,8 +115,10 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
         EdgeKVPairs kvPairs = new EdgeKVPairs();
         kvPairs.source = this.newKVPairs(this.sourceLabel,
                                          this.mapping.unfoldSource());
+        kvPairs.source.headerCaseSensitive(this.headerCaseSensitive());
         kvPairs.target = this.newKVPairs(this.targetLabel,
                                          this.mapping.unfoldTarget());
+        kvPairs.target.headerCaseSensitive(this.headerCaseSensitive());
         return kvPairs;
     }
 
@@ -170,7 +172,7 @@ public class EdgeBuilder extends ElementBuilder<Edge> {
                     continue;
                 }
 
-                String key = mapping.mappingField(fieldName);
+                String key = mappingField(fieldName);
                 if (isIdField(fieldName) &&
                     !props.contains(fieldName) && !props.contains(key)) {
                     continue;
